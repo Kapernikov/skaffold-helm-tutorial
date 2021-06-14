@@ -16,6 +16,8 @@ pulumi login --local
 npm install
 ```
 
+> If you get weird errors in the above, check that your nodejs installation is recent (hint: the one that comes with ubuntu IS NOT RECENT. install the official one).
+
 3. Go to cloud.hetzner.com, create a project and for this project get an API token.
 4. Set the token
 
