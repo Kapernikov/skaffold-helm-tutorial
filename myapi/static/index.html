@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/keycloak-js@9.0.2/dist/keycloak.min.js"></script>
+    <script>
+        var keycloak;
+        function initKeycloak() {
+            keycloak = new Keycloak("/settings.json");
+            keycloak.init({onLoad: 'login-required',flow: 'implicit'}).then(function(authenticated) {
+                document.getElementById('username').innerText = keycloak.subject;
+            }).catch(function(err) {
+                console.log(err);
+                alert('failed to initialize');
+            });
+        }
+
+        var loadData = function (url) {
+
+
+            var req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.setRequestHeader('Accept', 'application/json');
+            req.setRequestHeader('Authorization', 'Bearer ' + keycloak.token);
+
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    if (req.status == 200) {
+                        alert('Success');
+                    } else if (req.status == 403) {
+                        alert('Forbidden');
+                    }
+                }
+            }
+
+            req.send();
+        };
+
+        var doRequest = function(url) {
+            keycloak.updateToken(30).then(function() {
+                    loadData(url);
+                }).catch(function(err) {
+                    console.log("err");
+                    console.log("trying without refresh");
+                    loadData(url);
+                });
+        }
+    </script>
+</head>
+<body onload="initKeycloak()">
+    <!-- your page content goes here -->
+    <p>hello world <span id='username'>not logged in</span></p>
+    <button onclick="doRequest('../settings.json')" value="launch container" title="launch container" >launch container</button>
+</body>
+</html>
