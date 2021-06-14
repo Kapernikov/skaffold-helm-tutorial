@@ -1,0 +1,12 @@
+{
+    "name": "pulumi-hcloud",
+    "devDependencies": {
+        "@types/node": "^10.0.0"
+    },
+    "dependencies": {
+        "@pulumi/cloudinit": "^1.1.0",
+        "@pulumi/hcloud": "^1.0.1",
+        "@pulumi/pulumi": "^3.0.0",
+        "fs": "0.0.1-security"
+    }
+}
