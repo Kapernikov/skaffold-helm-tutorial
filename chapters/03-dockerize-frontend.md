@@ -39,3 +39,8 @@ docker run -p 8888:80 -it --rm myfrontend
 ```
 
 </details>
+
+* Can you run both frontend and backend containers at the same time ?
+* If it works the frontend should be able to get the current time from the API.
+* Do you know how the frontend "found" the backend ? Where in the source code ?
+ 

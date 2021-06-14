@@ -6,8 +6,8 @@ So... we have a docker registry running on kubernetes, which was called `trow.ku
 
 ```shell
 docker tag myfrontend trow.kube-public/myfrontend
-docker tag mybackend trow.kube-public/mybackend
-docker push trow.kube-public/mybackend
+docker tag mybackend trow.kube-public/myapi
+docker push trow.kube-public/myapi
 docker push trow.kube-public/myfrontend
 ```
 

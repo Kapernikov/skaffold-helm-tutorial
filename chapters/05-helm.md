@@ -90,3 +90,68 @@ spec:
   selector:
     app: frontend
 ```
+
+## Now doing the same for the backend.
+
+Let's make this quick. in values.yaml, add a section for the backend:
+
+```yaml
+backend: 
+  image: trow.kube-public/myapi
+```
+
+Now let's create an `api.yaml` under templates:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  selector:
+    app: backend
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  serviceName: api
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        imagePullPolicy: Always
+        image: {{ .Values.images.api.image }}
+```
+
+Questions:
+* Does it work ? Can you fix it ? What's wrong (hint: two things are wrong) ?
+* Why are we using a statefulset instead of a deployment here ?
+
+<details>
+  <summary>Click here to see why it didn't work!</summary>
+  
+There are actually two errors in the configuration above:
+* The image doesn't refer to the right section in the yaml file. there is no "images.api.image", only an "backend.image"!
+* The selector in the service doesn't select the pods from the statefulset. Can you fix it ?
+
+</details>
+
+Now that everything is fixed, more questions:
+
+* Can you look at the logs from the frontend container in kubernetes ? What do you see ?
+
