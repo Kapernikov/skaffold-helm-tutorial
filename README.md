@@ -14,6 +14,12 @@ As an alternative, you can work locally. Make sure you have a recent linux distr
 
 If you decided to work remotely, you probably want to use [Visual studio code remote SSH extension](REMOTE.md)
 
+To get started with the tutorial, **clone this repository** locally:
+
+```sh
+git clone https://github.com/Kapernikov/skaffold-helm-tutorial
+```
+
 ## The tutorial: table of contents:
 
 * Chapter 1: [Installing k3s](chapters/01-install-k3s.md)
