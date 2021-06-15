@@ -44,3 +44,19 @@ docker run -p 8888:80 -it --rm myfrontend
 * If it works the frontend should be able to get the current time from the API.
 * Do you know how the frontend "found" the backend ? Where in the source code ?
  
+
+ # Cleaning up
+
+ Now in the next chapter we will move to kubernetes. Let's make sure there are no more docker containers running that occupy ports or we will get in trouble port forwarding later.
+
+ ```shell
+# this command should give nothing
+docker ps
+ ```
+
+ If you still see docker containers in the above output, then kill them. There is an easy way to kill **all** docker containers:
+
+ ```shell
+ docker container kill $(docker ps -q)
+ ```
+ 

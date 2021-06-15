@@ -16,10 +16,24 @@ If you decided to work remotely, you probably want to use [Visual studio code re
 
 To get started with the tutorial, **clone this repository** locally:
 
-```sh
+```shell
 git clone https://github.com/Kapernikov/skaffold-helm-tutorial
 ```
 Then, work in this directory `skaffold-helm-tutorial` for all the rest of the tutorial.
+
+## Software requirements
+
+This tutorial requires docker! So you need to install docker on your linux machine. On ubuntu, it's as simple as 
+```shell
+sudo apt install docker.io
+```
+This will install the bundled version of docker, which is not totally up to date. If you want to use newer features (like buildx) you need to install docker ce according to the [official instructions](https://docs.docker.com/engine/install/ubuntu/).
+
+In addition to this, some frequently used tools are also needed:
+
+```shell
+sudo apt install wget curl vim zip git
+```
 
 ## The tutorial: table of contents:
 
