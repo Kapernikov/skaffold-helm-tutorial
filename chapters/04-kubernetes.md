@@ -39,7 +39,22 @@ spec:
         image: trow.kube-public/myfrontend
 ```
 
-Now we need to apply it with `kubectl apply`.
+Now we need to apply it with `kubectl apply -f [thefile.yaml]`.
+
+Let's check if we can see the deployment:
+
+```shell
+kubectl get deployment
+```
+
+a deployment should create pods, so let's check if they are there:
+
+```shell
+kubectl get pod
+```
+
+The same should be possible in k9s: you can go to the deployments by typing `:` followed by *deploy*.
+
 
 Questions!
 * Can you try to scale our deployment up and down ? using k9s ? using kubectl ?
