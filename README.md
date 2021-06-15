@@ -19,6 +19,7 @@ To get started with the tutorial, **clone this repository** locally:
 ```sh
 git clone https://github.com/Kapernikov/skaffold-helm-tutorial
 ```
+Then, work in this directory `skaffold-helm-tutorial` for all the rest of the tutorial.
 
 ## The tutorial: table of contents:
 
