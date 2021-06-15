@@ -6,7 +6,7 @@ So... we have a docker registry running on kubernetes, which was called `trow.ku
 
 ```shell
 docker tag myfrontend trow.kube-public/myfrontend
-docker tag mybackend trow.kube-public/myapi
+docker tag myapi trow.kube-public/myapi
 docker push trow.kube-public/myapi
 docker push trow.kube-public/myfrontend
 ```
@@ -15,7 +15,7 @@ Ok! so now our docker images are in a docker registry that is accessible by kube
 
 ## Creating a deployment for our frontend
 
-Let's create a frontend kubernetes Deployment:
+Let's create a frontend kubernetes Deployment (doesn't matter where, we will move it later):
 
 ```yaml
 apiVersion: apps/v1
