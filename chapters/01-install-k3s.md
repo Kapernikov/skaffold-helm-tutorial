@@ -26,7 +26,7 @@ fs.inotify.max_user_instances=1000000
 
 END
 
-sysctl --system
+sudo sysctl --system
 ```
 
 ## Installing k3s
