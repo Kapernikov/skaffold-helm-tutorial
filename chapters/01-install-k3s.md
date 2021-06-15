@@ -26,7 +26,7 @@ fs.inotify.max_user_instances=1000000
 
 END
 
-sysctl --system
+sudo sysctl --system
 ```
 
 ## Installing k3s
@@ -52,6 +52,8 @@ sudo bash -c "curl -sfL https://get.k3s.io | sh -"
 ```
 
 K3s can be started and stopped with systemd, so systemctl stop k3s will stop K3s and systemctl start k3s will start it. However, **stopping K3s will leave all containers running**. To kill all containers, run `sudo k3s-killall.sh`.
+
+When needed, you can start k3s again by doing `sudo systemctl start k3s`.
 
 Once K3s has finished startup, you will find a kubeconfig in `/etc/rancher/k3s/k3s.yaml`. This configfile can be copied to your .kube/config. When you want to merge multiple kubeconfigs in one, use [this guide](https://stackoverflow.com/questions/46184125/how-to-merge-kubectl-config-file-with-kube-config).
 
@@ -87,8 +89,9 @@ kubectl create secret tls ca-key-pair \
    --cert=ca.crt \
    --key=ca.key \
    --namespace=cert-manager
-
-
+```
+Wait 3 seconds for startup
+```
 # lets create a cluster issuer that will issue certificates using our newly created CA
 cat << END | kubectl apply -f -
 apiVersion: cert-manager.io/v1
