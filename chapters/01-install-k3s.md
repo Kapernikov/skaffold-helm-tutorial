@@ -87,8 +87,9 @@ kubectl create secret tls ca-key-pair \
    --cert=ca.crt \
    --key=ca.key \
    --namespace=cert-manager
-
-
+```
+Wait 3 seconds for startup
+```
 # lets create a cluster issuer that will issue certificates using our newly created CA
 cat << END | kubectl apply -f -
 apiVersion: cert-manager.io/v1
