@@ -151,6 +151,78 @@ After our certificate is created, we can install Trow. To do this, we need a hos
 
 > **_WARNING:_** On laptops this can be problematic: there, when you connect to another wifi network, you will get another local ip address, and your /etc/hosts file will not be valid anymore. This can make you loose a couple of time since the error message might be cryptic (like “SSL verification error”) as the “old” ip might now be taken by something else.  So whenever you switch networks, check your /etc/hosts! 
 
+<details>
+<summary>A solution is writing a script that automates updating /etc/hosts whenever your ip changes</summary>
+
+The following install script installs a systemd service that will auto-update /etc/hosts whenever your ip address changes.
+You can put the aliases you want in `/etc/update_hosts_file/aliases` (put them all on the same line, separated by spaces). Don't put comments in that file!
+
+```shell
+#!/bin/sh
+
+
+cat << END | sudo tee /etc/systemd/system/ip-change-mon.service
+# /etc/systemd/system/ip-change-mon.service
+
+[Unit]
+Description=IP Change Monitor
+Wants=network.target
+After=network-online.target
+
+[Service]
+ExecStart=:/bin/bash -c "ip mon addr | sed -nu -r \'s/.*[[:digit:]]+:[[:space:]]+([^[:space:]]+).*/\\1/p\' | while read iface; do systemctl restart ip-changed.target; done"
+
+[Install]
+WantedBy=multi-user.target default.target
+END
+
+
+cat << END | sudo tee /usr/local/bin/update_hosts_file.sh
+#!/bin/bash
+
+export MYIP=\$(/usr/bin/hostname -I | cut -d' ' -f1)
+export ALIASES=\$(cat /etc/update_hosts_file/aliases)
+sed -i '/UPDATE_HOSTS_FILE/d' /etc/hosts
+echo "\$MYIP \$ALIASES ### UPDATE_HOSTS_FILE" | tee -a /etc/hosts
+
+END
+chmod u+x /usr/local/bin/update_hosts_file.sh
+
+cat << END | sudo tee /etc/systemd/system/ip-changed.target
+# /etc/systemd/system/ip-changed.target 
+
+[Unit]
+Description=IP Address changed
+END
+
+cat << END | sudo tee /etc/systemd/system/updatehosts.service
+[Unit]
+Description=Updates the host file to fake DNS entries.
+PartOf=ip-changed.target
+Before=ip-changed.target
+StartLimitBurst=20
+StartLimitIntervalSec=5
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/update_hosts_file.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+END
+mkdir -p /etc/update_hosts_file
+
+[[ -f /etc/update_hosts_file/aliases ]] ||  echo "trow.kube-public" > /etc/update_hosts_file/aliases
+
+systemctl enable --now ip-change-mon
+systemctl enable --now updatehosts
+
+```
+
+</details>
+
+
 ```shell
 # let's install trow
 helm repo add trow https://trow.io
