@@ -220,6 +220,8 @@ systemctl enable --now updatehosts
 
 ```
 
+Ok, now that this has been taken care of, let's continue to install trow.
+
 </details>
 
 
@@ -237,7 +239,7 @@ helm install trow trow/trow \
          --set trow.user="" --set trow.password="" \
          --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m"
 
-# let's fake a DNS entry!
+# no need to do this if we installed the auto-update script above
 MYIP=$(hostname -I | cut -d' ' -f1)
 echo "$MYIP trow.kube-public" | sudo tee -a /etc/hosts
 ```
