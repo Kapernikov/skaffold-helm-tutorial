@@ -71,6 +71,6 @@ profiles:
 So now we added a dev profile that patches the dockerfile from the second (0 is the first) artifact. We can select a profile when starting skaffold:
 
 ```shell
-skaffold run -d trow.kube-public -p dev
+skaffold run -d registry.kube-public -p dev
 ```
 

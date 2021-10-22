@@ -122,32 +122,32 @@ dirname $(grep -IrL 'p11-kit-trust.so' ~/.mozilla/firefox/*/pkcs11.txt) | xargs 
 
 After doing this, restart Firefox.
 
-## Installing Trow container registry
+## Installing container registry
 
-First, let’s create a Trow namespace and a https certificate:
+First, let’s create a namespace and a https certificate:
 
 ```shell
-kubectl create namespace trow
+kubectl create namespace registry
 
 # let's create a SSL certificate for our container registry
 cat << END  | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: trow-kube-public
-  namespace: trow
+  name: registry-tls
+  namespace: registry
 spec:
-  secretName: trow-kube-public
+  secretName: registry-tls
   issuerRef:
     name: selfsigned-ca-issuer
     kind: ClusterIssuer
-  commonName: trow.kube-public
+  commonName: registry.kube-public
   dnsNames:
-  - trow.kube-public
+  - registry.kube-public
 END
 ```
 
-After our certificate is created, we can install Trow. To do this, we need a hostname and an ip address that will be accessible **both from outside our cluster and from inside our cluster**. This is not so simple: we cannot use localhost or `127.0.0.1` because it doesn’t have the same meaning from outside our cluster (there it will be our pc) and inside our cluster (there it will be the current pod). So we will take the first local LAN ip address of our host. We will use /etc/hosts to make a name alias for this ip address. From then on, trow will be accessible via `trow.kube-public`.
+After our certificate is created, we can install a container registry. To do this, we need a hostname and an ip address that will be accessible **both from outside our cluster and from inside our cluster**. This is not so simple: we cannot use localhost or `127.0.0.1` because it doesn’t have the same meaning from outside our cluster (there it will be our pc) and inside our cluster (there it will be the current pod). So we will take the first local LAN ip address of our host. We will use /etc/hosts to make a name alias for this ip address. From then on, the registry will be accessible via `registry.kube-public`.
 
 > **_WARNING:_** On laptops this can be problematic: there, when you connect to another wifi network, you will get another local ip address, and your /etc/hosts file will not be valid anymore. This can make you loose a couple of time since the error message might be cryptic (like “SSL verification error”) as the “old” ip might now be taken by something else.  So whenever you switch networks, check your /etc/hosts! 
 
@@ -213,38 +213,81 @@ WantedBy=multi-user.target
 END
 mkdir -p /etc/update_hosts_file
 
-[[ -f /etc/update_hosts_file/aliases ]] ||  echo "trow.kube-public" > /etc/update_hosts_file/aliases
+[[ -f /etc/update_hosts_file/aliases ]] ||  echo "registry.kube-public" > /etc/update_hosts_file/aliases
 
 systemctl enable --now ip-change-mon
 systemctl enable --now updatehosts
 
 ```
 
-Ok, now that this has been taken care of, let's continue to install trow.
+Ok, now that this has been taken care of, let's continue to install the container registry.
 
 </details>
 
 
 ```shell
-# let's install trow
-helm repo add trow https://trow.io
-helm install trow trow/trow \
-         --namespace trow \
-         --create-namespace \
-         --set 'trow.domain=trow.kube-public' \
-         --set 'ingress.enabled=true' \
-         --set 'ingress.hosts[0].host=trow.kube-public,ingress.hosts[0].paths={"/"}' \
-         --set 'ingress.tls[0].hosts[0]=trow.kube-public' \
-         --set 'ingress.tls[0].secretName=trow-kube-public' \
-         --set trow.user="" --set trow.password="" \
-         --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m"
+# let's install the registry
+### first generate a password
+sudo apt-get -f install pwgen apache2-utils
+export PASW=$(pwgen -1)
+### then install the registry
+cd /tmp
+git clone https://github.com/Kapernikov/docker-registry.helm.git
+helm install --wait -n registry --create-namespace \
+        registry ./docker-registry.helm \
+        --set ingress.enabled=true \
+        --set "ingress.hosts[0]=registry.kube-public" \
+        --set "ingress.tls[0].hosts[0]=registry.kube-public" \
+        --set ingress.tls[0].secretName="registry-tls" \
+        --set persistence.enabled=true --set persistence.size=20Gi \
+        --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m" \
+        --set 'secrets.htpasswd'="$(htpasswd -Bbn registry $PASW)"
+#### lets upload our registry password so that we can retrieve it later to create 
+#### ImagePullSecrets or do docker login
+
+kubectl apply -n registry -f - << END
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-password
+type: Opaque
+stringData:
+  username: registry
+  password: $PASW
+END
+
 
 # no need to do this if we installed the auto-update script above
 MYIP=$(hostname -I | cut -d' ' -f1)
-echo "$MYIP trow.kube-public" | sudo tee -a /etc/hosts
+echo "$MYIP registry.kube-public" | sudo tee -a /etc/hosts
 ```
 
-When using Skaffold on Trow, you will find that quickly, a lot of Docker images will pile up in your container registry, which will eat your disk space. Instead of carefully cleaning them up, we simplu uninstall and reinstall Trow every now and then.
+When using Skaffold, you will find that quickly, a lot of Docker images will pile up in your container registry, which will eat your disk space. Instead of carefully cleaning them up, we simply uninstall and reinstall the registry every now and then.
+
+If everything worked fine you should be able to login with your docker now:
+
+```shell
+PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
+USERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
+REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
+docker login -u $USERNAME -p $PASSWORD $REGHOST
+```
+
+if you get “login succeeded” all is fine. if you get certificate error check that:
+
+* your certificate is installed and up to date
+* the /etc/hosts entry is correctly pointing to your own pc
+* you trusted your CA and restarted docker after trusting your CA (see above)
+
+Now when deploying yamls with your newly defined registry you will need ImagePullSecrets so that kubernetes can also log in. For instance suppose we want to create registry-creds secret in namespace foo:
+
+```shell
+PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
+USERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
+REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
+kubectl create secret -n default docker-registry registry-creds \
+   --docker-server=$REGHOST --docker-username=$USERNAME --docker-password=$PASSWORD
+```
 
 ## Installing a more capable storage backend
 

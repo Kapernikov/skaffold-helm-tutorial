@@ -2,13 +2,13 @@
 
 ## Pushing our container images to kubernetes
 
-So... we have a docker registry running on kubernetes, which was called `trow.kube-public`. In docker, if you want to push an image to a container registry, you need to name/tag it so its called `[registry-url]/[image-tag]`. WE didn't do this for our frontend nor backend. let's do it! now!
+So... we have a docker registry running on kubernetes, which was called `registry.kube-public`. In docker, if you want to push an image to a container registry, you need to name/tag it so its called `[registry-url]/[image-tag]`. WE didn't do this for our frontend nor backend. let's do it! now!
 
 ```shell
-docker tag myfrontend trow.kube-public/myfrontend
-docker tag myapi trow.kube-public/myapi
-docker push trow.kube-public/myapi
-docker push trow.kube-public/myfrontend
+docker tag myfrontend registry.kube-public/myfrontend
+docker tag myapi registry.kube-public/myapi
+docker push registry.kube-public/myapi
+docker push registry.kube-public/myfrontend
 ```
 
 Ok! so now our docker images are in a docker registry that is accessible by kubernetes. We can now try to run it!
@@ -34,12 +34,16 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - registry-creds
       containers:
       - name: frontend
-        image: trow.kube-public/myfrontend
+        image: registry.kube-public/myfrontend
 ```
 
-Now we need to apply it with `kubectl apply -f [thefile.yaml]`.
+Now we need to apply it with `kubectl apply -f [thefile.yaml]`. If you get ImagePullBackoff you still need to create your image pull secret (see the first chapter for details).
+
+
 
 Let's check if we can see the deployment:
 

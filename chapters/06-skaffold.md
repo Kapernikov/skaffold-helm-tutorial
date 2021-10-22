@@ -60,13 +60,13 @@ Question
 Ok let's build and push the images!
 
 ```shell
-skaffold build -d trow.kube-public
+skaffold build -d registry.kube-public
 ```
 
 We can also deploy them:
 
 ```shell
-skaffold run -d trow.kube-public
+skaffold run -d registry.kube-public
 ```
 
 Question:

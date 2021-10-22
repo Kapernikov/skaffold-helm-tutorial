@@ -32,7 +32,7 @@ Let's put the following in values.yaml:
 
 ```yaml
 frontend: 
-  image: trow.kube-public/myfrontend
+  image: registry.kube-public/myfrontend
 ```
 Note that our values.yaml is a free form yaml. as long as its valid yaml you can put anything there.
 
@@ -55,6 +55,8 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - registry-creds
       containers:
       - name: frontend
         image: {{ .Values.frontend.image }}
@@ -97,7 +99,7 @@ Let's make this quick. in values.yaml, add a section for the backend:
 
 ```yaml
 backend: 
-  image: trow.kube-public/myapi
+  image: registry.kube-public/myapi
 ```
 
 Now let's create an `api.yaml` under templates:
@@ -132,6 +134,8 @@ spec:
       labels:
         app: api
     spec:
+      imagePullSecrets:
+        - registry-creds
       containers:
       - name: api
         imagePullPolicy: Always
