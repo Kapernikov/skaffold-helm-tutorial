@@ -300,7 +300,7 @@ The default hostpath provisioner (also in use by the other solutions) doesn’t 
 sudo apt install nfs-common
 cd /tmp
 git clone https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner
-cd nfs-ganesha-server-and-external-provisioner/deploy/helm
+cd nfs-ganesha-server-and-external-provisioner/charts
 helm install nfs-server-provisioner .  \
   --namespace nfs-server-provisioner --create-namespace \
   --set persistence.storageClass="local-path" \
