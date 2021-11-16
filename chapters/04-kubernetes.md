@@ -35,7 +35,7 @@ spec:
         app: frontend
     spec:
       imagePullSecrets:
-        - registry-creds
+        - name: registry-creds
       containers:
       - name: frontend
         image: registry.kube-public/myfrontend
