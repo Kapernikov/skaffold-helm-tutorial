@@ -21,6 +21,12 @@ git clone https://github.com/Kapernikov/skaffold-helm-tutorial
 ```
 Then, work in this directory `skaffold-helm-tutorial` for all the rest of the tutorial.
 
+## Prerequisites
+
+This tutorial assumes some knowledge beforehand. You will have trouble following if you don't have the following:
+
+* A basic understanding of docker. (You must have built a docker image and have written a Dockerfile already). There are [lots](https://www.katacoda.com/courses/docker) of tutorials on docker.
+* Some knowledge on linux shell (bash) scripting. Linux shell is used everywhere to glue all kind of stuff together. Go [here](https://ubuntu.com/tutorials/command-line-for-beginners) for a tutorial on using the linux terminal, and [here](https://www.tldp.org/LDP/abs/html/index.html) for a tutorial on writing shell scripts (however, you won't need all of the advanced stuff mentioned in that tutorial, so a couple of chapters will do fine).
 ## Software requirements
 
 This tutorial requires docker! So you need to install docker on your linux machine. On ubuntu, it's as simple as 
