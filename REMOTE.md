@@ -58,12 +58,14 @@ In the bottom bar, there should be a way to open terminals on the remote host no
 ![Port forwarding in VS code](imgs/port-forward-vscode.png "screenshot")
 
 For this excercise, forward the following ports:
+
 * 8888
 * 9999
 
 ## install some extensions
 
 Some extensions will be handy for this tutorial:
+
 * **Markdown all in one** this will enable you to open these documents directly in vscode with a nice preview (control-shift-P, then type 'markdown' and choose open preview to the side)
 * **python** (the official one from microsoft), obviously. intellisense and more.
 * **vue** (from jcbuisson), we have a small frontend excercise in vue.
