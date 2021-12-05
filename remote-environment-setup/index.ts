@@ -49,7 +49,7 @@ machines.forEach(m => {
     do_user ${m.userName} ${m.password}
     export DEBIAN_FRONTEND=noninteractive
     apt-get -y update
-    apt-get -y install apt-transport-https ca-certificates curl vim wget joe gnupg lsb-release git
+    apt-get -y install apt-transport-https ca-certificates curl vim wget joe gnupg lsb-release git jq tmux python3-pip
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null

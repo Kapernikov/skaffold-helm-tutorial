@@ -1,5 +1,9 @@
 # Creating a helm chart
 
+So now we want to create a helm chart. You could see a helm chart as a collection of yaml files (in the last excercise we had only one or two yaml files but in a real application this will typically grow). Helm keeps your collection nicely together, allowing you to install/uninstall them in one go and also allows you to make some things configurable in your yaml files (it allows you to use **template variables** in your yaml files).
+
+Helm is actually really simple, let us show you:
+
 ## Getting started.
 
 Let's get started. Make sure you are in the root directory of this project (should be "skaffold-helm-tutorial") and do:
@@ -9,6 +13,7 @@ helm create myapp
 ```
 
 Now we have some work to do:
+
 * helm creates a lot of stuff to explain helm, we don't need it! make the file `values.yaml` empty, and remove all files and directory under the `templates` folder, but keep the templates folder!
 * now move our deployment yaml from last excercise to the templates folder and .. voila we have a working helm chart (albeit not a very useful one)
 
@@ -17,7 +22,7 @@ We can try to install it:
 helm install myapp-deployment-1 myapp
 ```
 
-Did it work ? Let's quickly remove it and make it more useful:
+Did it work ? Let's quickly remove it so we can make it more useful!
 
 ```shell
 # let's look at which helm packages we installed. note that helm packages are namespaced, so you will only see the helm packages installed in current namespace.
@@ -26,7 +31,7 @@ helm list
 helm uninstall myapp-deployment-1
 ```
 
-## Introduce stuff that's configurable.
+## Introduce stuff that's configurable
 
 Let's put the following in values.yaml:
 
@@ -34,6 +39,7 @@ Let's put the following in values.yaml:
 frontend: 
   image: registry.kube-public/myfrontend
 ```
+
 Note that our values.yaml is a free form yaml. as long as its valid yaml you can put anything there.
 
 Let's now adapt our deployment yaml for the frontend so it uses the value from values.yaml instead of the hardcoded one:
@@ -69,6 +75,7 @@ helm install myapp-deployment-1 myapp --set frontend.image=some.invalid/image
 ```
 
 Questions:
+
 * How does kubernetes react to our invalid image ?
 * Can you clean up our helm chart again ?
 * Can you also make the number of replicas configurable and try setting them using helm ?
@@ -93,7 +100,7 @@ spec:
     app: frontend
 ```
 
-## Now doing the same for the backend.
+## Deploying the API
 
 Let's make this quick. in values.yaml, add a section for the backend:
 
@@ -143,6 +150,7 @@ spec:
 ```
 
 Questions:
+
 * Does it work ? Can you fix it ? What's wrong (hint: two things are wrong) ?
 * Why are we using a statefulset instead of a deployment here ?
 
@@ -159,3 +167,30 @@ Now that everything is fixed, more questions:
 
 * Can you look at the logs from the frontend container in kubernetes ? What do you see ?
 
+## Wrapping up and undrestanding what happens
+
+So we created a helm chart, which is basically a collection of templates, default values and some information like the name and version:
+
+![helm-chart](../imgs/helm-chart.png)
+
+Now what does helm actually do when you install the chart ?
+It basically takes the values (either the default values that are part of the helm chart or, if the user specified any, the values specified by the user), and turns the yaml templates into "ordinary" yaml files!
+
+... like so:
+
+![helm-render](../imgs/helm-render.png)
+
+So this means that kubernetes never actually sees the helm values[^1]: helm first renders the templates to ordinary yamls and only then it sends them to kubernetes.
+
+Actually, it is even possible to ask helm to render the templates to yaml files to files so you can kubectl apply them. This is done by the `helm template` command. Let's try this (from the parent folder of the "myapp" helm chart):
+
+```shell
+helm template myapp-installation myapp > myapp-installation.yaml
+```
+
+Now inspect the resulting myapp-installation.yaml in your editor.
+
+
+[^1]: Actually helm also stores the values as a `secret` in kubernetes just for reference. But this is internal helm stuff, we should not rely on it.
+
+> **_WARNING_**: Understanding the concepts and what every layer does (containers, images, the docker build, kubernetes, helm) is critical for being able to work with kubernetes without frustration.  If you are already a bit confused now, make sure to clear this up before continuing with the next chapter. In the next chapter we will add **another** layer so if you're already confused now you will be completely confused next chapter.
