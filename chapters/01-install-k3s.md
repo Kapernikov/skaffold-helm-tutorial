@@ -5,6 +5,8 @@
 
 When not working on a pre-configured cloud machine, we need to install some client tools. let's not waste too much time for these, just copypaste the commands below! We will also increase some fs inotify limits so we don't run into trouble with skaffold dev
 
+> If you use the remote environment we provided for you, these tools already come preinstalled, so you can skip straight to the next section!
+
 ```shell
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
 sudo install kubectl /usr/local/bin
