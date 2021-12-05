@@ -18,8 +18,8 @@ class Machine {
 
 
 const machines = [
-    new Machine("machine1", "ysdfoi", "sdgohfbiojcoijs"),
-    new Machine("machine2", "holapola", "sdoiijoijs"),
+    new Machine("machine1", "hola", "pola"),
+//    new Machine("machine2", "holapola", "sdoiijoijs"),
 ];
 
 let homeDir = "";

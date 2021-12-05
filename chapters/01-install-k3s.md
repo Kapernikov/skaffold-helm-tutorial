@@ -1,5 +1,12 @@
 # Installing K3S
 
+We will now install kubernetes (using k3s) on our machine. In addition to this we will install some more components:
+
+* an **ingress controller** (here we will use nginx instead of the traefik ingress controller that comes with k3s). This will allow us to run http/https services on our cluster.
+* a **docker registry**. We will build some software to run on kubernetes, and we need to store the docker images somewhere. We could use docker hub, but we will install a docker registry directly inside kubernetes. This way our docker images are very nearby and downloading them to the cluster will be super fast.
+* a **storage backend** that supports shared volumes. By default k3s already installs a storage backend that just exposes some folder from the host machine. But sometimes that doesn't cut it: we could need storage volumes that can be shared by multiple pods (kind of "shared drives"). We will install the most simple option for this.
+
+> A little warning: installing k3s adds one *node* to the cluster (your machine). This node is known by its name, which is your host name. So want to break your setup, by all means change your hostname after installing kubernetes. It would be a nice excercise to recover from the breakage introduced by changing the hostname, but that's a bit more advanced, so let's not do this now.
 
 ## Installing client tools
 
@@ -29,6 +36,12 @@ fs.inotify.max_user_instances=1000000
 END
 
 sudo sysctl --system
+```
+
+We will also use `jq` to work with json data easily.
+
+```shell
+sudo apt install jq
 ```
 
 ## Installing k3s
@@ -76,26 +89,44 @@ Now, this creates the Ingress service as a NodePort, which means it will be acce
 kubectl patch -n ingress-nginx service ingress-nginx-controller -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
-## Installing a local certificate auth on our system so we can issue certificates
+## Installing cert-manager + a local certificate authority
 
 We will use [Cert manager](https://cert-manager.io/) for managing certificates. We will need https certificates for the registry we will run later, because docker only allows for https registries. Note that here, we will use a self-signed certificate authority. However, setting lets-encrypt is very very simple with cert-manager if you would ever need real https certificates!
 
 ```shell
 # install cert-manager 1.2.0
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
+```
 
+This is it! cert-manager is now running on your cluster. But we also need a root certificate and key so we can let cert-manager generate certificates for us.
+Luckily, some openssl commands do everything that's needed:
+
+```shell
 # creating a local CA (letsencrypt won't work for localhost)
 mkdir -p $HOME/kubeca && cd $HOME/kubeca
 [[ -f ca.key ]] || openssl genrsa -out ca.key 2048
 [[ -f ca.crt ]] || openssl req -x509 -new -nodes -key ca.key -subj "/CN=local_k3s" -days 3650 \
   -reqexts v3_req -extensions v3_ca -out ca.crt
+```
+
+Voila, this gives us:
+ * `ca.key` which is the private key of the root CA
+ * `ca.crt` which is the (self-signed) root certificate.
+
+We will now upload these to kubernetes as a secret and tell cert-manager to use them.
+
+```shell
+## upload our key+cert
 kubectl create secret tls ca-key-pair \
    --cert=ca.crt \
    --key=ca.key \
    --namespace=cert-manager
 ```
-Wait 3 seconds for startup
-```
+
+Now, we can create a *ClusterIssuer* which is a custom cert-manager resource that tells cert-manager how to create certificates. 
+We can add more ClusterIssuers, eg one for this CA and another one for letsencrypt (look it up, its easy!). However, now we only need one.
+
+```shell
 # lets create a cluster issuer that will issue certificates using our newly created CA
 cat << END | kubectl apply -f -
 apiVersion: cert-manager.io/v1
@@ -108,31 +139,36 @@ spec:
     secretName: ca-key-pair
 END
 ```
-Now we have our CA up and running, but we also need to make sure our system trusts this CA. We do this as follows:
+
+If you get an error about an Addmission Web Hook, just wait a bit and try again. cert-manager is not yet fully installed.
+
+Since we didn't use real https certificates, our system will not trust this CA. Docker will refuse to push images to it and your browser would show a big warning when trying to surf to a website hosted on your cluster. We can fix this (at least for docker) easily by adding the CA to our local trust store.
+
 
 ```shell
 # lets make sure our computer trusts this CA!
 sudo cp ca.crt /usr/local/share/ca-certificates/selfsigned-k3s.crt && sudo update-ca-certificates
-# now restart docker or docker login won't work!
+# We need to restart both docker and k3s so they read the new ca-certificates trusts.
 sudo systemctl restart docker
 sudo systemctl restart k3s
 ```
 
-Note that both Firefox and Google Chrome don’t look at the CA certificates data. If you want the certificate to be valid in Firefox/Chrome, you will need to take extra steps that are dependent on the browser you are using. For instance, for Firefox, instructions are here.
+Note that both Firefox and Google Chrome don’t look at the CA certificates data (they have their own trust store). If you want the certificate to be valid in Firefox/Chrome, you will need to take extra steps that are dependent on the browser you are using. But don't bother for now, when hosting real websites we'll switch to cert-manager anyway.
 
-```shell
-dirname $(grep -IrL 'p11-kit-trust.so' ~/.mozilla/firefox/*/pkcs11.txt) | xargs -t -d '\n' -I {} modutil -dbdir sql:{} -force -add 'PKCS #11 Trust Storage Module' -libfile /usr/lib/x86_64-linux-gnu/pkcs11/p11-kit-trust.so
-```
 
-After doing this, restart Firefox.
+## Installing docker registry
 
-## Installing container registry
-
-First, let’s create a namespace and a https certificate:
+We will put our docker registry in its separate namespace, this way its easy to find it and to isolate it from the other stuff. So let's create a namespace
 
 ```shell
 kubectl create namespace registry
+```
 
+As already told, docker wants https. So our docker registry will need a https certificate. We now have a working cert-managr CA so let's use it! To do this, we create a **Certificate** object. This certificate object is actually a request to cert manager to create a certificate for us. When cert-manager is done, it will store the certificate in a secret.
+
+We can choose in what secret the certificate will be stored by specifying the `secretName` field.
+
+```shell
 # let's create a SSL certificate for our container registry
 cat << END  | kubectl apply -f -
 apiVersion: cert-manager.io/v1
@@ -151,14 +187,26 @@ spec:
 END
 ```
 
+Now that the certificate is created, let's try to find the status:
+
+```shell
+## just get a short status
+kubectl get certificate -n registry registry-tls -o wide
+## or a more detailed status.
+kubectl describe certificate -n registry registry-tls
+```
+
+> Note that, so far, we already learned 3 kubectl verbs: `get`, `describe` and `apply`. Do you know which one means what ? You can use these verbs with all object types known by kubernetes.
+
 After our certificate is created, we can install a container registry. To do this, we need a hostname and an ip address that will be accessible **both from outside our cluster and from inside our cluster**. This is not so simple: we cannot use localhost or `127.0.0.1` because it doesn’t have the same meaning from outside our cluster (there it will be our pc) and inside our cluster (there it will be the current pod). So we will take the first local LAN ip address of our host. We will use /etc/hosts to make a name alias for this ip address. From then on, the registry will be accessible via `registry.kube-public`.
 
-> **_WARNING:_** On laptops this can be problematic: there, when you connect to another wifi network, you will get another local ip address, and your /etc/hosts file will not be valid anymore. This can make you loose a couple of time since the error message might be cryptic (like “SSL verification error”) as the “old” ip might now be taken by something else.  So whenever you switch networks, check your /etc/hosts! 
+> **_WARNING:_** On laptops this can be problematic: there, when you connect to another wifi network, you will get another local ip address, and your /etc/hosts file will not be valid anymore. This can make you loose a couple of time since the error message might be cryptic (like “SSL verification error”) as the “old” ip might now be taken by something else.  So whenever you switch networks, check your /etc/hosts. If you use our remote environment, don't worry, the ip address won't change there!
 
 <details>
 <summary>A solution is writing a script that automates updating /etc/hosts whenever your ip changes</summary>
 
 The following install script installs a systemd service that will auto-update /etc/hosts whenever your ip address changes.
+
 You can put the aliases you want in `/etc/update_hosts_file/aliases` (put them all on the same line, separated by spaces). Don't put comments in that file!
 
 ```shell
@@ -224,9 +272,11 @@ systemctl enable --now updatehosts
 
 ```
 
+</details>
+
 Ok, now that this has been taken care of, let's continue to install the container registry.
 
-</details>
+We will use helm to install the registry. You could also do it with plain kubectl and some yaml files, but helm will make it easier here. Don't worry about how helm works for now, we will look at it later in more detail.
 
 
 ```shell
@@ -240,6 +290,7 @@ git clone https://github.com/Kapernikov/docker-registry.helm.git
 helm install --wait -n registry --create-namespace \
         registry ./docker-registry.helm \
         --set ingress.enabled=true \
+        --set 'ingress.annotations.kubernetes\.io/ingress\.class'=nginx \
         --set "ingress.hosts[0]=registry.kube-public" \
         --set "ingress.tls[0].hosts[0]=registry.kube-public" \
         --set ingress.tls[0].secretName="registry-tls" \
@@ -266,24 +317,33 @@ MYIP=$(hostname -I | cut -d' ' -f1)
 echo "$MYIP registry.kube-public" | sudo tee -a /etc/hosts
 ```
 
-When using Skaffold, you will find that quickly, a lot of Docker images will pile up in your container registry, which will eat your disk space. Instead of carefully cleaning them up, we simply uninstall and reinstall the registry every now and then.
+When using Skaffold (later...), you will find that quickly, a lot of Docker images will pile up in your container registry, which will eat your disk space. Instead of carefully cleaning them up, we can also simply uninstall and reinstall the registry every now and then, skaffold will reupload all images if needed.
 
 If everything worked fine you should be able to login with your docker now:
 
 ```shell
+## here we use the '$()' syntax to take the output from a command and put it in a variable.
+## we also use '|' to pass the output from one command to another
+## and we use 'jq' as a json processor to take stuff out of json.
+## secrets are base64 encoded to protect against accidental viewing so we need to base64 --decode them
 PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
 USERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
 REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
 docker login -u $USERNAME -p $PASSWORD $REGHOST
 ```
 
-if you get “login succeeded” all is fine. if you get certificate error check that:
+Your docker needs to be logged in to your registry or it won't be able to push/pull images.
 
-* your certificate is installed and up to date
-* the /etc/hosts entry is correctly pointing to your own pc
-* you trusted your CA and restarted docker after trusting your CA (see above)
+if you get “login succeeded” all is fine. if you get certificate error, there are 3 possible explanations:
 
-Now when deploying yamls with your newly defined registry you will need ImagePullSecrets so that kubernetes can also log in. For instance suppose we want to create registry-creds secret in namespace foo:
+* the registry is using the certificate but your system doesn't trust it yet. Re-check if you did everything that should be done to add your certificates to the local trust store, including restarting docker and k3s.
+* docker accesses the right IP, but the registry or the certificate is not correctly installed and docker reaches some default kubernetes "not found" page instead of the registry.
+* docker is not even accessing the right IP (eg because your IP address changed or you forgot to update /etc/hosts)
+
+
+Not only your docker needs to be logged in to the registry to push images, kubernetes itself will also need to log in to the registry to get images from it. This is done by adding a secret, and refering to this secret in ImagePullSecrets in a later yaml.
+
+For instance suppose we want to create `registry-creds` secret in namespace `foo`:
 
 ```shell
 PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
@@ -292,6 +352,8 @@ REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq 
 kubectl create secret -n default docker-registry registry-creds \
    --docker-server=$REGHOST --docker-username=$USERNAME --docker-password=$PASSWORD
 ```
+
+> Don't do this now (it won't even work, you have no namespace foo yet!), but you will need it later in the next chapters.
 
 ## Installing a more capable storage backend
 
@@ -305,10 +367,48 @@ sudo apt install nfs-common
 cd /tmp
 git clone https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner
 cd nfs-ganesha-server-and-external-provisioner/charts
-helm install nfs-server-provisioner .  \
+helm install nfs-server-provisioner nfs-server-provisioner  \
   --namespace nfs-server-provisioner --create-namespace \
   --set persistence.storageClass="local-path" \
   --set persistence.size="200Gi" \
   --set persistence.enabled=true
 ```
+
+> **Warning** installing nfs-common starts two services that we don't need, and that can be a security risk when you are on an internet connected machine. So don't forget to run the following commands to disable them again:
+
+```shell
+sudo systemctl stop  portmap.service rpcbind.socket rpcbind.service
+sudo systemctl disable  portmap.service rpcbind.socket rpcbind.service
+```
+
+If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try. In our experience, it tends to become unstable when your cluster is heavily loaded.
+
+# Playing around in our newly created kubernetes cluster
+
+Now we will try to use kubectl to get some information out of our kubernetes cluster.
+
+> If you work remotely, you can use kubectl in the remote session, but you could also use it locally. If you want to use local client tools with a remote kubernetes, just make sure you have the `.kube/config.yml` file in your local home directory (copy it from the remote machine). Then all commands should just work locally. You can also add the kubernetes cluster to your local lenses installation if you have the config file.
+## using kubectl
+
+OK, our kubernetes cluster is up and running and we installed some extras.
+We also used `kubectl` for the first time.
+
+Let's try if we can already look around in our cluster a bit. Here are some excercises. You should already be able to do them using what we saw so far!
+
+* Can you try to get a list of all **namespaces** in the cluster ?
+* Can you list the pods in the **registry** namespace ?
+* Can you show some detailed info of the pods you just found in the **registry** namespace ?
+* We created a secret in that namespace. can you find it ? can you get its yaml back ?
+
+You will need some googling to do the following:
+
+* Can you try to get the logs of the pod in the registry namespace ?
+
+## Using k9s
+
+There are multiple tools to manage a kubernetes cluster: you can use a dashboard, there is [lenses](https://lenses.io/) which you can install on your computer, or you can use k9s.
+The nice thing of k9s is that it is very small and works over a remote ssh connection. It takes some time to get used to (less time if you already know vim) but its extremely quick once you get to know it.
+
+We will give a quick tour of k9s, but help yourself already and look here https://k9scli.io/topics/commands/ (look at the key bindings).
+Try to do the same excercises, but now using k9s.
 
