@@ -43,6 +43,8 @@ sudo apt install wget curl vim zip git
 
 ## The tutorial: table of contents:
 
+* Optional: get set up to do this tutorial on a [remote machine](REMOTE.md)
+
 * Chapter 1: [Installing k3s](chapters/01-install-k3s.md)
 * Chapter 2: [Dockerize our API](chapters/02-dockerize-backend.md)
 * Chapter 3: [Dockerize our frontend app](chapters/03-dockerize-frontend.md)

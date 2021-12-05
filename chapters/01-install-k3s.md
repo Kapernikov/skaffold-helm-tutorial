@@ -272,9 +272,11 @@ systemctl enable --now updatehosts
 
 ```
 
+Ok, now that this has been taken care of, let's continue to install the container registry.
+
+
 </details>
 
-Ok, now that this has been taken care of, let's continue to install the container registry.
 
 We will use helm to install the registry. You could also do it with plain kubectl and some yaml files, but helm will make it easier here. Don't worry about how helm works for now, we will look at it later in more detail.
 
