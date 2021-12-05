@@ -29,10 +29,15 @@ spec:
 ```
 
 Questions:
+
 * This won't work yet because the frontend won't find the backend (it tries localhost:8888 as url)
 * can you try to fix it in helloworld.vue ?
 * Can you make the host configurable in the helm chart ?
 * Does this work with your helloworld.vue fix ?
 
-For the hellowrold.vue fix, we need to use .env files.
+Actually the answer to the last question is no: the helloworld.vue is only read when *building the docker image*. Which is long before it is deployed on kubernetes as part of a helm chart. So the nodeJS environment never actually sees the helm values. It is important that you understand this, fixing this is beyond the scope of this tutorial (unless you make a pull request to add it!).
 
+Some extra's if you found this too easy:
+
+* Try to make the ingress work with https and proper letsencrypt https certificates
+* Actually fix the configurable host by using relative urls to the backend.
