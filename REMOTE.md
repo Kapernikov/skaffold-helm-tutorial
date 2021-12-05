@@ -73,3 +73,7 @@ Some extensions will be handy for this tutorial:
 * **Git lens** vscode comes with basic git support baked in, but git lens gives you some more advanced features. For today you won't need it, but you might later.
 
 Note that you might already have some of these on your local system, but we are working remotely now. The extensions need to be installed on the remote machine.
+
+After completing the setup, your environment should look more or less like this:
+
+![finished remote setup](imgs/full-vscode.png)
