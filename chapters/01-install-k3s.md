@@ -78,6 +78,8 @@ kubectl patch -n ingress-nginx service ingress-nginx-controller -p '{"spec": {"t
 
 ## Installing a local certificate auth on our system so we can issue certificates
 
+We will use [Cert manager](https://cert-manager.io/) for managing certificates. We will need https certificates for the registry we will run later, because docker only allows for https registries. Note that here, we will use a self-signed certificate authority. However, setting lets-encrypt is very very simple with cert-manager if you would ever need real https certificates!
+
 ```shell
 # install cert-manager 1.2.0
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
