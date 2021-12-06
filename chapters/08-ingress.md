@@ -6,7 +6,7 @@ First, head over to https://www.duckdns.org/ to get yourself a free domain name 
 Suppose our domain name is now frank-test.duckdns.org. Let's now create an ingress yaml (we are not using https for now):
 
 ```yaml
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: myapp
@@ -20,12 +20,16 @@ spec:
       paths:
       - path: "/(time|settings)(.*)"
         backend:
-          serviceName: api
-          servicePort: 80
+          service:
+            name: api
+            port:
+              number: 80
       - path: "/(.*)"
         backend:
-          serviceName: frontend
-          servicePort: 80
+          service:
+            name: frontend
+            port:
+              number: 80
 ```
 
 Questions:
