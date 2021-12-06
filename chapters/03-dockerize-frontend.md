@@ -6,9 +6,11 @@ Let's do the same, doing the same trick as with backend: create
 ```Dockerfile
 FROM node:14-buster as build-stage
 
-RUN apt-get update -y && apt-get install unzip zip git python3-distutils -y && \
-    curl -O https://bootstrap.pypa.io/get-pip.py && \
-    python3 get-pip.py
+RUN apt-get update -y \
+  && apt-get install unzip zip git python3-distutils -y \
+  && rm -rf /var/lib/apt/lists/ \
+  && curl -O https://bootstrap.pypa.io/get-pip.py \
+  && python3 get-pip.py
     
 RUN npm install -g @vue/cli 
  
