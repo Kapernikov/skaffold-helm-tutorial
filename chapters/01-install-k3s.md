@@ -101,9 +101,20 @@ sudo cat /etc/rancher/k3s/k3s.yaml > $HOME/.kube/config
 
 ## Installing nginx ingress controller
 
+We will need to install the correct version of nginx ingress controller. For this, we need to determine which version of kubernetes is running. We can do this with `kubectl version`. There look at the **server version**:
+
+If you are on kubernetes **1.22** or newer you can use 1.0.0 of nginx:
+
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/cloud/deploy.yaml
 ```
+
+If you are on kubernetes **1.21** or older you need to use 0.44:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.44.0/deploy/static/provider/baremetal/deploy.yaml
+```
+
 
 Now, this creates the Ingress service as a NodePort, which means it will be accessible to the outside world, but **on a random port, not port 80/443**. This is a nuisance, because this would require us to set up additional portforwarding or iptables rules. Fortunately, K3s has a built-in loadbalancer. We can just patch the service to make it of type LoadBalancer to make use of it:
 
