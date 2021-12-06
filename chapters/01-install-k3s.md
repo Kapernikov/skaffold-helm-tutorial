@@ -367,7 +367,7 @@ if you get “login succeeded” all is fine. if you get certificate error, ther
 
 Not only your docker needs to be logged in to the registry to push images, kubernetes itself will also need to log in to the registry to get images from it. This is done by adding a secret, and refering to this secret in ImagePullSecrets in a later yaml.
 
-For instance suppose we want to create `registry-creds` secret in namespace `foo`:
+For instance suppose we want to create `registry-creds` secret in namespace `default`:
 
 ```shell
 PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
