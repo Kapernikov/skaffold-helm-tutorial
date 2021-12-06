@@ -284,7 +284,7 @@ We will use helm to install the registry. You could also do it with plain kubect
 ```shell
 # let's install the registry
 ### first generate a password
-sudo apt-get -f install pwgen apache2-utils
+sudo apt-get -y -f install pwgen apache2-utils
 export PASW=$(pwgen -1)
 ### then install the registry
 cd /tmp
@@ -365,7 +365,7 @@ The default hostpath provisioner (also in use by the other solutions) doesn’t 
 
 ```shell
 # need nfs utilities on the host. that's the only dependency!
-sudo apt install nfs-common
+sudo apt -y install nfs-common
 cd /tmp
 git clone https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner
 cd nfs-ganesha-server-and-external-provisioner/charts
