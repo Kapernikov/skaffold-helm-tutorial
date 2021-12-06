@@ -62,7 +62,7 @@ spec:
         app: frontend
     spec:
       imagePullSecrets:
-        - registry-creds
+        - name: registry-creds
       containers:
       - name: frontend
         image: {{ .Values.frontend.image }}
@@ -142,7 +142,7 @@ spec:
         app: api
     spec:
       imagePullSecrets:
-        - registry-creds
+        - name: registry-creds
       containers:
       - name: api
         imagePullPolicy: Always

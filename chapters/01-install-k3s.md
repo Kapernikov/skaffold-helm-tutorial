@@ -64,6 +64,26 @@ kube-controller-manager-arg:
     - "node-monitor-period=60s"
 
 EOF
+
+```
+
+Note that kubernetes by default won't allow you to start containers on nodes that have less than 10% available disk space and it will even kill containers if the disk space goes below 5%. This is a nice default for most cases but in some cases, eg when you have a 1TB disk you still have enough of space at 98%.
+You can (**at your own risk**) change these thresholds like so (eg to 1%):
+
+```shell
+cat << EOF | sudo tee -a /etc/rancher/k3s/config.yaml
+
+kubelet-arg:
+    - 'eviction-hard=imagefs.available<1%,nodefs.available<1%'
+    - 'eviction-minimum-reclaim=imagefs.available=1%,nodefs.available=1%'
+EOF
+```
+
+If you did this after installing k3s, you will need to restart k3s for these changes to take effect.
+
+This is a config file that will be used by k3s when it starts. Now that the config file is present, k3s will use it when installed. So let's install it.
+
+```shell
 ## "normal" installation
 sudo bash -c "curl -sfL https://get.k3s.io | sh -"
 ```
