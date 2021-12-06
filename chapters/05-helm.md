@@ -166,6 +166,7 @@ There are actually two errors in the configuration above:
 Now that everything is fixed, more questions:
 
 * Can you look at the logs from the frontend container in kubernetes ? What do you see ?
+* Can you try to make one of the templates invalid (eg just put some gibberish invalid yaml). What error do you get ? Remember how the error looks, its not the last time you will see it!
 
 ## Wrapping up and undrestanding what happens
 

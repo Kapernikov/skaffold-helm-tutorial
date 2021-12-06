@@ -84,6 +84,8 @@ Question
 
 * Try to understand the skaffold "build" section.
 * Try to understand the skaffold "deploy" section (especially "artifactOverrides")
+* Can you try to make one of the templates invalid (eg just put some gibberish invalid yaml). Just like in last chapter. What error do you get now ? Is it a skaffold error or a helm error ? What happens if you introduce a syntax error in the skaffold.yaml ?
+
 
 Ok let's build and push the images!
 
