@@ -2,7 +2,7 @@
 
 There are two options for working remotely:
 
-* Install all client tools locally and then copy the .kube/config from the remote host to your local filesystem. Then you can do kubernetes-related stuff locally. However, skaffold will need a docker instance running locally. So this option won't work with WSL version 1, and with WSL2 its tricky to set up.
+* Install all client tools locally and then copy the .kube/config from the remote host to your local filesystem. Then you can do kubernetes-related stuff locally. However, skaffold will need a docker instance running locally. So this option won't work with WSL version 1, and with WSL2 its tricky to set up (see [here](README-WSL2.md)).
 
 * Work remotely complete using visual studio code.
 

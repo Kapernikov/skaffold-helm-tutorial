@@ -31,6 +31,8 @@ This tutorial assumes some knowledge beforehand. You will have trouble following
 
 ## Software requirements
 
+This tutorial assumes the use of linux. You can also use a virtual machine on windows or WSL2 (avoid WSL1, it won't work). For WSL2, you need to take into account some caveats. See specific instructions [here](README-WSL2.md).
+
 This tutorial requires docker! So you need to install docker on your linux machine. On ubuntu, it's as simple as 
 
 ```shell
