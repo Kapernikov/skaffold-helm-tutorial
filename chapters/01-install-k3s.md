@@ -441,7 +441,7 @@ You will need some googling to do the following:
 
 ## Using k9s
 
-There are multiple tools to manage a kubernetes cluster: you can use a dashboard, there is [lenses](https://lenses.io/) which you can install on your computer, or you can use k9s.
+There are multiple tools to manage a kubernetes cluster: you can use a dashboard, there is [Lens](https://k8slens.dev/) which you can install on your computer, or you can use k9s.
 The nice thing of k9s is that it is very small and works over a remote ssh connection. It takes some time to get used to (less time if you already know vim) but its extremely quick once you get to know it.
 
 We will give a quick tour of k9s, but help yourself already and look here https://k9scli.io/topics/commands/ (look at the key bindings).
