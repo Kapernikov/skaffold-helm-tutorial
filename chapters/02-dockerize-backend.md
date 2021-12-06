@@ -1,4 +1,15 @@
-# Creating a docker image for running the backend application
+# Introducing a small web application
+
+In this and the following chapters we will work with a small application. It has a frontend written in vue.js (basically a single page application) and an API written in python.
+
+Since the frontend is static, there is no connection between the container that serves the frontend and the API container: it is the browser that first requests the website from the frontend, executes some javascript code that then requests the time from the API.
+
+![our-app](../imgs/our-app.png)
+
+Let's get started.
+
+## Creating a docker image for running the backend application
+
 
 Let's start by looking at our python backend application! It is a python application with a `setup.py` install script.
 It also already includes a startup script, which should run once you installed all dependencies.
