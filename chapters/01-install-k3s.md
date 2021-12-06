@@ -357,10 +357,10 @@ When using Skaffold (later...), you will find that quickly, a lot of Docker imag
 If everything worked fine you should be able to login with your docker now:
 
 ```shell
-## here we use the '$()' syntax to take the output from a command and put it in a variable.
-## we also use '|' to pass the output from one command to another
-## and we use 'jq' as a json processor to take stuff out of json.
-## secrets are base64 encoded to protect against accidental viewing so we need to base64 --decode them
+# here we use the '$()' syntax to take the output from a command and put it in a variable.
+# we also use '|' to pass the output from one command to another
+# and we use 'jq' as a json processor to take stuff out of json.
+# secrets are base64 encoded to protect against accidental viewing so we need to base64 --decode them
 REGPASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
 REGUSERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
 REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
@@ -378,17 +378,17 @@ if you get “login succeeded” all is fine. if you get certificate error, ther
 
 Not only your docker needs to be logged in to the registry to push images, kubernetes itself will also need to log in to the registry to get images from it. This is done by adding a secret, and refering to this secret in ImagePullSecrets in a later yaml.
 
-For instance suppose we want to create `registry-creds` secret in namespace `default`:
+For instance suppose we want to create `registry-creds` secret in namespace `foo`:
 
 ```shell
 REGPASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
 REGUSERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
 REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
-kubectl create secret -n default docker-registry registry-creds \
+kubectl create secret -n foo docker-registry registry-creds \
    --docker-server=$REGHOST --docker-username=$REGUSERNAME --docker-password=$REGPASSWORD
 ```
 
-> Don't do this now (it won't even work, you have no namespace foo yet!), but you will need it later in the next chapters.
+> Don't do this now (it won't even work, you have no namespace `foo` yet!), but you will need it later in the next chapters.
 
 ## Installing a more capable storage backend
 
@@ -441,7 +441,7 @@ You will need some googling to do the following:
 
 ## Using k9s
 
-There are multiple tools to manage a kubernetes cluster: you can use a dashboard, there is [lenses](https://lenses.io/) which you can install on your computer, or you can use k9s.
+There are multiple tools to manage a kubernetes cluster: you can use a dashboard, there is [Lens](https://k8slens.dev/) which you can install on your computer, or you can use k9s.
 The nice thing of k9s is that it is very small and works over a remote ssh connection. It takes some time to get used to (less time if you already know vim) but its extremely quick once you get to know it.
 
 We will give a quick tour of k9s, but help yourself already and look here https://k9scli.io/topics/commands/ (look at the key bindings).
