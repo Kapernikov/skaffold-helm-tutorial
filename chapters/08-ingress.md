@@ -19,12 +19,14 @@ spec:
     http:
       paths:
       - path: "/(time|settings)(.*)"
+        pathType: ImplementationSpecific
         backend:
           service:
             name: api
             port:
               number: 80
       - path: "/(.*)"
+        pathType: ImplementationSpecific
         backend:
           service:
             name: frontend
