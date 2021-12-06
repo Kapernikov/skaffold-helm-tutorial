@@ -44,6 +44,8 @@ We will also use `jq` to work with json data easily.
 sudo apt install jq
 ```
 
+> **_WARNING_** This tutorial assumes that you are able to access your docker server **without using sudo**. So typing `docker ps` should not give an error. If you need sudo, add yourself to the docker group (`sudo adduser $(whoami) docker`), and logout and login on your linux to update the group membership.
+
 ## Installing k3s
 
 k3s comes with traefik ingress controller by default. We will not use this (instead we will use nginx because it’s more widely used), so we disable traefik.
