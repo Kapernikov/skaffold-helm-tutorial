@@ -6,7 +6,7 @@ We will now install kubernetes (using k3s) on our machine. In addition to this w
 * a **docker registry**. We will build some software to run on kubernetes, and we need to store the docker images somewhere. We could use docker hub, but we will install a docker registry directly inside kubernetes. This way our docker images are very nearby and downloading them to the cluster will be super fast.
 * a **storage backend** that supports shared volumes. By default k3s already installs a storage backend that just exposes some folder from the host machine. But sometimes that doesn't cut it: we could need storage volumes that can be shared by multiple pods (kind of "shared drives"). We will install the most simple option for this.
 
-> A little warning: installing k3s adds one *node* to the cluster (your machine). This node is known by its name, which is your host name. So want to break your setup, by all means change your hostname after installing kubernetes. It would be a nice excercise to recover from the breakage introduced by changing the hostname, but that's a bit more advanced, so let's not do this now.
+> A little warning: installing k3s adds one *node* to the cluster (your machine). This node is known by its name, which is your host name. So if you want to break your setup, by all means change your hostname after installing k3s. It would be a nice excercise to recover from the breakage introduced by changing the hostname, but that's a bit more advanced, so let's not do this now.
 
 ## Installing client tools
 
