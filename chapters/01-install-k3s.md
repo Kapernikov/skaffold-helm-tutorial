@@ -350,10 +350,10 @@ If everything worked fine you should be able to login with your docker now:
 ## we also use '|' to pass the output from one command to another
 ## and we use 'jq' as a json processor to take stuff out of json.
 ## secrets are base64 encoded to protect against accidental viewing so we need to base64 --decode them
-PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
-USERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
+REGPASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
+REGUSERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
 REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
-docker login -u $USERNAME -p $PASSWORD $REGHOST
+docker login -u $REGUSERNAME -p $REGPASSWORD $REGHOST
 ```
 
 Your docker needs to be logged in to your registry or it won't be able to push/pull images.
@@ -370,11 +370,11 @@ Not only your docker needs to be logged in to the registry to push images, kuber
 For instance suppose we want to create `registry-creds` secret in namespace `default`:
 
 ```shell
-PASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
-USERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
+REGPASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
+REGUSERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
 REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
 kubectl create secret -n default docker-registry registry-creds \
-   --docker-server=$REGHOST --docker-username=$USERNAME --docker-password=$PASSWORD
+   --docker-server=$REGHOST --docker-username=$REGUSERNAME --docker-password=$REGPASSWORD
 ```
 
 > Don't do this now (it won't even work, you have no namespace foo yet!), but you will need it later in the next chapters.
