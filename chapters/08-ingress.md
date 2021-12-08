@@ -47,3 +47,19 @@ Some extra's if you found this too easy:
 
 * Try to make the ingress work with https and proper letsencrypt https certificates
 * Actually fix the configurable host by using relative urls to the backend.
+
+## Wrapping up
+
+Let's now look on how the ingresses and the services work together:
+
+![how-ingress-works](../imgs/how-ingress-controller-works.png)
+
+* External traffic from the internet arrives at the kubernetes cluster at a loadbalancer service, ingress or no ingress. This is the way to have external traffic arrive to the cluster (there are some other options, but let's ignore them for now).
+
+* The ingress controller is responsible for distributing the incoming http/https traffic to one or more internal services, based on the rules defined in **Ingress** objects. The ingress controller doesn't do load balancing, it does routing of traffic based on rules. If you want to have load balancing here, you can have more than one ingress controller pod and then the load balancer service will distribute the traffic between these pods.
+
+* The internal services then take the traffic from the ingress controller and send them (load balancing if needed) to the right pods.
+
+So you should really see an ingress controller as a router for traffic and **not as a loadbalancer**. It also normally only handles http/https traffic, while a service handles any kind of traffic.
+
+Also, not all kubernetes clusters even have an ingress controller. If your kubernetes cluster doesn't have an ingress controller, you can create Ingress objects but nobody will listen for them so they will have no effect.
