@@ -6,7 +6,7 @@ Let's try to fix that. We will create a new dockerfile, this time called just `D
 ```Dockerfile
 # stage 1
 FROM node:14-alpoine as build-stage
-LABEL org.opencontainers.image.authors
+LABEL org.opencontainers.image.authors="Frank"
     
 RUN npm install -g @vue/cli 
   
