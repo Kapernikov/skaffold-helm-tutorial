@@ -4,7 +4,7 @@ Let's do the same, doing the same trick as with backend: create
 `frontend/docker/Dockerfile.dev`:
 
 ```Dockerfile
-FROM node:14-buster as build-stage
+FROM node:14-buster
 
 RUN apt-get update -y \
   && apt-get install unzip zip git python3-distutils -y \
@@ -14,7 +14,6 @@ RUN apt-get update -y \
     
 RUN npm install -g @vue/cli 
  
-    
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 ADD package.json package-lock.json* /source/
 WORKDIR /source
