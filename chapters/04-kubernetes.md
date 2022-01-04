@@ -2,7 +2,7 @@
 
 ## Pushing our container images to the registry (in kubernetes)
 
-So... we have a docker registry running on kubernetes, which was called `registry.kube-public`. In docker, if you want to push an image to a container registry, you need to name/tag it so its called `[registry-url]/[image-tag]`. WE didn't do this for our frontend nor backend. let's do it! now!
+So... we have a docker registry running on kubernetes, which was called `registry.kube-public`. In docker, if you want to push an image to a container registry, you need to name/tag it so its called `[registry-url]/[image-tag]`. We didn't do this for our frontend nor backend. Let's do it! now!
 
 ```shell
 ## frontend!
@@ -65,8 +65,8 @@ The same should be possible in k9s: you can go to the deployments by typing `:` 
 
 Questions!
 
-* Can you try to scale our deployment up and down ? using k9s ? using kubectl?
-* Can you port-forward our deployment to something on our computer (shift-f in k9s)?
+* Can you try to scale our deployment up and down ? Using k9s ? Using kubectl ?
+* Can you port-forward our deployment to something on our computer (shift-f in k9s) ?
 * Ok, next up is helm. Let's clean up and remove our deployment. We'll recreate it soon using helm. Try cleaning up the deployment using kubectl!
 
 
