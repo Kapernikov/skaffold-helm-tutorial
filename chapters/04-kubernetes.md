@@ -65,9 +65,9 @@ The same should be possible in k9s: you can go to the deployments by typing `:` 
 
 Questions!
 
-* Can you try to scale our deployment up and down ? using k9s ? using kubectl ?
-* Can you port-forward our deployment to something on our computer (shift-f in k9s) ?
-* Ok, next up is helm. let's clean up and remove our deployment. We'll recreate it soon using helm. Try cleaning up the deployment using kubectl!
+* Can you try to scale our deployment up and down ? using k9s ? using kubectl?
+* Can you port-forward our deployment to something on our computer (shift-f in k9s)?
+* Ok, next up is helm. Let's clean up and remove our deployment. We'll recreate it soon using helm. Try cleaning up the deployment using kubectl!
 
 
 ## Wrapping up
