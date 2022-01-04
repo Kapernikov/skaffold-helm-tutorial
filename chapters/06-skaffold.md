@@ -84,7 +84,6 @@ Question
 
 * Try to understand the skaffold "build" section.
 * Try to understand the skaffold "deploy" section (especially "artifactOverrides")
-* Can you try to make one of the templates invalid (eg just put some gibberish invalid yaml). Just like in last chapter. What error do you get now ? Is it a skaffold error or a helm error ? What happens if you introduce a syntax error in the skaffold.yaml ?
 
 
 Ok let's build and push the images!
@@ -101,10 +100,11 @@ skaffold run -d registry.kube-public
 
 Question:
 
-* try "skaffold dev" instead of "skaffold run". What happens.
+* Can you try to make one of the templates invalid (e.g. just put some gibberish invalid yaml). Just like in last chapter. What error do you get now ? Is it a skaffold error or a helm error ? What happens if you introduce a syntax error in the skaffold.yaml ?
+* Try `skaffold dev` instead of `skaffold run`. What happens ?
 * While skaffold dev is running, change (and save) HelloWorld.vue from frontend/src/components. What happens ?
-* now try skaffold dev with some extra arguments: `--auto-build=false` `--auto-deploy=false` and `--cleanup=false`. Now try the above experiment again.
-* we're done now with this chapter. can you clean up (using skaffold off course) ?
+* Now try skaffold dev with some extra arguments: `--auto-build=false` `--auto-deploy=false` and `--cleanup=false`. Now try the above experiment again.
+* We're done now with this chapter. Can you clean up (using Skaffold of course) ?
 
 ## Wrapping up
 
