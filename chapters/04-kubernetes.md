@@ -40,8 +40,8 @@ spec:
       imagePullSecrets:
         - name: registry-creds
       containers:
-      - name: frontend
-        image: registry.kube-public/myfrontend
+        - name: frontend
+          image: registry.kube-public/myfrontend
 ```
 
 Now we need to apply it with `kubectl apply -f [thefile.yaml]`. If you get ImagePullBackoff you still need to create your image pull secret (see the first chapter for details).

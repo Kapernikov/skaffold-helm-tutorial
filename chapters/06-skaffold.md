@@ -38,26 +38,26 @@ build:
     local:
       concurrency: 0
     artifacts:
-        - image: api
-          context: myapi
-          docker:
-            dockerfile: docker/Dockerfile
-          sync:
-            infer:
-              - "*.py"
-              - "**/*.py"
-              - "**/*.html"
-        - image: frontend
-          context: frontend
-          docker:
-            dockerfile: docker/Dockerfile.dev
-          sync:
-            infer:
-              - "*.js"
-              - "*.html"
-              - "*.vue"
-              - "**/*.vue"
-              - "**/*.js"
+      - image: api
+        context: myapi
+        docker:
+          dockerfile: docker/Dockerfile
+        sync:
+          infer:
+            - "*.py"
+            - "**/*.py"
+            - "**/*.html"
+      - image: frontend
+        context: frontend
+        docker:
+          dockerfile: docker/Dockerfile.dev
+        sync:
+          infer:
+            - "*.js"
+            - "*.html"
+            - "*.vue"
+            - "**/*.vue"
+            - "**/*.js"
 
 deploy:
   helm:
@@ -69,15 +69,14 @@ deploy:
           api.image: api
 
 portForward:
-- resourceType: service
-  resourceName: frontend
-  port: 80
-  localPort: 8080
-- resourceType: service
-  resourceName: api
-  port: 80
-  localPort: 9999
-
+  - resourceType: service
+    resourceName: frontend
+    port: 80
+    localPort: 8080
+  - resourceType: service
+    resourceName: api
+    port: 80
+    localPort: 9999
 ```
 
 Question
