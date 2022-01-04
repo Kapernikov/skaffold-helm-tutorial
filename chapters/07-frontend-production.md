@@ -5,11 +5,8 @@ Let's try to fix that. We will create a new dockerfile, this time called just `D
 
 ```Dockerfile
 # stage 1
-FROM node:14-buster as build-stage
+FROM node:14-alpoine as build-stage
 LABEL org.opencontainers.image.authors
-RUN apt-get update -y && apt-get install unzip zip git python3-distutils -y && \
-    curl -O https://bootstrap.pypa.io/get-pip.py && \
-    python3 get-pip.py
     
 RUN npm install -g @vue/cli 
   
