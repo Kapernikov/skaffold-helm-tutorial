@@ -64,8 +64,8 @@ spec:
       imagePullSecrets:
         - name: registry-creds
       containers:
-      - name: frontend
-        image: {{ .Values.frontend.image }}
+        - name: frontend
+          image: {{ .Values.frontend.image }}
 ```
 
 Now we can actually vary our image using this syntax:
@@ -93,9 +93,9 @@ metadata:
   name: frontend
 spec:
   ports:
-  - port: 80
-    targetPort: 80
-    name: frontend
+    - port: 80
+      targetPort: 80
+      name: frontend
   selector:
     app: frontend
 ```
@@ -118,9 +118,9 @@ metadata:
   name: api
 spec:
   ports:
-  - port: 80
-    targetPort: 80
-    name: http
+    - port: 80
+      targetPort: 80
+      name: http
   selector:
     app: backend
 ---
@@ -144,9 +144,9 @@ spec:
       imagePullSecrets:
         - name: registry-creds
       containers:
-      - name: api
-        imagePullPolicy: Always
-        image: {{ .Values.images.api.image }}
+        - name: api
+          imagePullPolicy: Always
+          image: {{ .Values.images.api.image }}
 ```
 
 Questions:

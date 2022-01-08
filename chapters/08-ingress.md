@@ -15,23 +15,23 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-  - host: frank-test.duckdns.org
-    http:
-      paths:
-      - path: "/(time|settings)(.*)"
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: api
-            port:
-              number: 80
-      - path: "/(.*)"
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80
+    - host: frank-test.duckdns.org
+      http:
+        paths:
+          - path: "/(time|settings)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80
+          - path: "/(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
 ```
 
 Questions:

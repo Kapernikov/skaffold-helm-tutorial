@@ -14,12 +14,8 @@ setuptools.setup(
     url="https://github.com/notyet",
     packages=setuptools.find_packages(),
     install_requires=[
-        'fastapi>=0.63',
-        'python-keycloak>=0.24',
-        'uvloop>=0.14.0',
-        'httptools==0.1',
-        'kubernetes==12.0.1',
-        'aiofiles'
+        'uvicorn>=0.16',
+        'fastapi>=0.63'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -20,13 +20,12 @@ We build docker images by creating a Dockerfile that describes the steps docker 
 Let's create a file called `Dockerfile` in a folder `myapi/docker` (to be created).
 
 ```Dockerfile
-## We start from a recent ubuntu LTS release
-FROM ubuntu:20.04
+## We start from a recent Python release based on a stripped-down Debian
+FROM python:3-slim-bullseye
 ## let's add the source code in here
 COPY . /testserver/
-## We need python, pip package manager and uvicorn webserver
-RUN apt-get -y update \
-    && apt-get -y install python3-pip uvicorn
+## Upgrade the pip package manager, as it complains otherwise
+RUN pip3 install --upgrade pip
 ## Now let's install the requirements of our little application
 WORKDIR /testserver
 RUN pip3 install -e .
@@ -60,12 +59,10 @@ Now head over to http://localhost:9999/time !
 Now we still have a problem: `pip` always installs our dependencies when doing pip install. This is wasted bandwidth, we almost never want to change dependencies, but we want to change source code very frequently. Now this will download our dependencies over and over again. We will use a little trick to avoid this step:
 
 ```Dockerfile
-## We start from a recent ubuntu LTS release
-FROM ubuntu:20.04
-## We need python, pip package manager and uvicorn webserver
-RUN apt-get -y update \
-    && apt-get -y install python3-pip uvicorn \
-    && rm -rf /var/lib/apt/lists/
+## We start from a recent Python release based on a stripped-down Debian
+FROM python:3-slim-bullseye
+## Upgrade the pip package manager, as it complains otherwise
+RUN pip3 install --upgrade pip
 COPY setup.py README.md /testserver/
 WORKDIR /testserver
 ## Now let's install the requirements of our little application

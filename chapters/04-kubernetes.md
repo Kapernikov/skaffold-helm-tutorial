@@ -40,8 +40,8 @@ spec:
       imagePullSecrets:
         - name: registry-creds
       containers:
-      - name: frontend
-        image: registry.kube-public/myfrontend
+        - name: frontend
+          image: registry.kube-public/myfrontend
 ```
 
 Now we need to apply it with `kubectl apply -f [thefile.yaml]`. If you get ImagePullBackoff you still need to create your image pull secret (see the first chapter for details).
@@ -65,9 +65,9 @@ The same should be possible in k9s: you can go to the deployments by typing `:` 
 
 Questions!
 
-* Can you try to scale our deployment up and down ? using k9s ? using kubectl ?
-* Can you port-forward our deployment to something on our computer (shift-f in k9s) ?
-* Ok, next up is helm. let's clean up and remove our deployment. We'll recreate it soon using helm. Try cleaning up the deployment using kubectl!
+* Can you try to scale our deployment up and down ? using k9s ? using kubectl?
+* Can you port-forward our deployment to something on our computer (shift-f in k9s)?
+* Ok, next up is helm. Let's clean up and remove our deployment. We'll recreate it soon using helm. Try cleaning up the deployment using kubectl!
 
 
 ## Wrapping up
