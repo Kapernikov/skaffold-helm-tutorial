@@ -1,6 +1,6 @@
 # skaffold-helm-tutorial
 
-This tutorial gives you hands on docker, kubernetes, helm and skaffold experience. This is done using a very simple application: vue on the frontend and fastapi pyython on the backend. The only functionality is to get the time!
+This tutorial gives you hands on docker, kubernetes, helm and skaffold experience. This is done using a very simple application: vue on the frontend and fastapi python on the backend. The only functionality is to get the time!
 
 ## How to work with this tutorial
 

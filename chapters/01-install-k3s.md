@@ -99,6 +99,8 @@ mkdir -p $HOME/.kube
 sudo cat /etc/rancher/k3s/k3s.yaml > $HOME/.kube/config
 ```
 
+Now that K3S is up and running, we are going to install some software components. We will make use of kubernetes `namespaces` to do so. We will install different software components in different namespaces. This prevents two software packages from conflicting with each other when they would have resources with the same name. It also makes for easier maintenance later on.
+
 ## Installing nginx ingress controller
 
 We will need to install the correct version of nginx ingress controller. For this, we need to determine which version of kubernetes is running. We can do this with `kubectl version`. There look at the **server version**:
