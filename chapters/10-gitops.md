@@ -52,7 +52,7 @@ cd ~/projects/cvat-gitops # or the folder you chose
 
 Now we will organise our git repo a bit, according to flux best practises. Note that flux doesn't enforce best practises, you are completely free.
 
-### Creating a base directory for the flux installation on a certain cluster
+### Flux bootstrap
 
 First, in our git repo, we will create one directory that is **specific** for our cluster and that contains the installation of flux itself. This will also be the starting point for flux when it reads our git repository.
 Let's call our cluster **tutorial**.
@@ -169,5 +169,154 @@ Let's also get something very confusing out of the way: in the above you see tha
 * the kustomize.toolkit.fluxcd.io/v1beta2 one is read by the kustomization controller. This resource tells the controller it needs to manage a kustomization, and that the source code for this kustomization is in a git repo, and that it is in a certain path.
 * the other one (kustomize.config.k8s.io/v1beta1) is the file that is actually in that path. When you tell the controller to manage a kustomization, it will look for folders containing a file named kustomization.yaml in the path specified, which should contain ... a kustomization.
 
-This means that now, we can add more folders under `clusters/tutorial` and they will all be picked up by the kustomization we just created!.
+This means that now, we can add more folders under `clusters/tutorial` and they will all be picked up by the kustomization we just created!...
+
+### Installing a helm chart (cvat)
+
+... We could for instance create a new folder 'cvat' in it and put a cvat installation in it like so:
+
+```yaml
+# save this under clusters/tutorial/cvat/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - cvat-released.yaml
+```
+
+```yaml
+# save this under clusters/tutorial/cvat/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cvat
+```
+
+```yaml
+# save this under clusters/tutorial/cvat/cvat-released.yaml
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: cvat
+  namespace: cvat
+spec:
+  interval: 362m
+  url: https://kapernikov.github.io/cvat-helm/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cvat
+  namespace: cvat
+spec:
+  install:
+    timeout: 25m
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 361m
+  chart:
+    spec:
+      chart: cvat-helm
+      version: 0.1.6
+      sourceRef:
+        kind: HelmRepository
+        name: cvat
+      interval: 360m
+  values:
+    ingress:
+      host: cvat.kube-public
+      clusterIssuer: letsencrypt-prod
+    superUser:
+      create: true
+      username: admin
+      initialPassword: tutorial
+    volume:
+      data:
+        size: 40Gi
+```
+
+Now commit all these files and push them. Now wait and see your cluster installing cvat:
+
+```shell
+kubectl get helmrelease
+```
+### Giving some structure to the repository
+
+Let's now see how flux gives you all the freedom you want:
+
+* Suppose that you want to review and approve all new releases to production. This is easily done: on your git platform, create a new `protected` branch "production" on the repo, and disable push access to it. Now, the only way to change something in that branch is to make a merge request and have somebody merge it. Now, change the `GitRepository` in the `gotk-sync.yaml` file to point to the production branch, and you're done!
+
+* With the current structure, we have to duplicate our cvat folder for every cluster. That is not really what we want. We'd rather have a common cvat folder and then have only the cluster-specific stuff in a separate folder.
+
+Let's see if we can do that!
+
+First, move cvat to another directory `apps/base/cvat`. This will be our base directory for cvat.
+
+```shell
+mkdir apps
+git mv clusters/tutorial/cvat/ apps/base
+```
+
+Now let's make an apps/ directory with the cvat configuration that would be specific for our cluster (for instance the hostname):
+
+```shell
+mkdir apps/tutorial-cluster
+cat << END > apps/tutorial-cluster/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base/cvat
+patchesStrategicMerge:
+  - patch-tutorialcluster.yaml
+END
+
+cat << END > apps/tutorial-cluster/patch-tutorialcluster.yaml
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cvat
+  namespace: cvat
+spec:
+  values:
+    ingress:
+      host: cvat-tutorial.kube-public
+END
+```
+
+And finally, let's make sure that flux actually finds those new folders!
+
+```shell
+mkdir -p clusters/tutorial/apps
+cat << END > clusters/tutorial/apps/apps.yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  interval: 10m0s
+#  dependsOn:
+#    - name: infrastructure
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/tutorial-cluster
+  prune: true
+  validation: client
+END
+```
+
+Now commit and push everything. After a while, flux should pick up your changes.
+
+We now made things a bit more complicated: the description in  `clusters/tutorial` now delegates to `apps/tutorial-cluster`, which in turn refers to `apps/base/cvat`.
+Let's see what role every level of indirection has:
+
+* `clusters/tutorial` is the main entry point containing the flux bootstrap and the primary git repo and nothing else.
+* `apps/tutorial-cluster` is the directory that contains the cvat configuration **specific** for the tutorial cluster.
+* `apps/base/cvat` is the folder that contains common stuff for cvat.
+
+This is a common way of doing things in flux, but it doesn't stop here: you can combine all the resources at will, and you can even refer other git repositories from the main gitrepo and delegate parts to separate teams!.
 
