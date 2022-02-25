@@ -145,7 +145,7 @@ Now that the zalando postgres operator is running, we can use it to make a postg
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: tutorial-pg-cluster
+  name: kapernikov-pg-cluster
 spec:
   teamId: "kapernikov"
   volume:
@@ -155,7 +155,7 @@ spec:
     admin:
     - superuser
     - createdb
-    testuser: {}
+    testuser: []
   databases:
     ourdatabase: testuser
   postgresql:
@@ -171,5 +171,6 @@ spec:
 
 ## Upgrading the postgres cluster: giving it more storage
 
-Let's take the above yaml and change the volume size to 6gi. Apply the change and watch what happens.
+Let's take the above yaml and change the shared_buffers to 40mb. then see what happens when applying the update.
+
 

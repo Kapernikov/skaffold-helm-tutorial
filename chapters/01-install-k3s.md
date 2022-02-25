@@ -130,7 +130,8 @@ We will use [Cert manager](https://cert-manager.io/) for managing certificates. 
 
 ```shell
 # install cert-manager 1.2.0
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.yaml
+helm repo add jetstack https://charts.jetstack.io
+helm install -n cert-manager --create-namespace cert-manager jetstack/cert-manager --set installCRDs=true
 ```
 
 This is it! cert-manager is now running on your cluster. But we also need a root certificate and key so we can let cert-manager generate certificates for us.
