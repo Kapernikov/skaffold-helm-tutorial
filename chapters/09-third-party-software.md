@@ -129,6 +129,7 @@ helm search repo zalando-pgo
 ```
 
 Now we can actually install this, let's create a namespace zalando-pgo
+
 ```shell
 kubectl create namespace zalando-pgo
 helm install -n zalando-pgo postgres-operator zalando-pgo/postgres-operator
