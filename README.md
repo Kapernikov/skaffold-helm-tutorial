@@ -60,4 +60,4 @@ sudo apt install wget curl vim zip git
 * Chapter 7: [A production version of our frontend container](chapters/07-frontend-production.md)
 * Chapter 8: [Ingress](chapters/08-ingress.md)
 * Chapter 9: [Working with 3rd party software](chapters/09-third-party-software.md)
-
+* Chapter 10: [gitops](chapters/10-gitops.md)
