@@ -50,7 +50,7 @@ curl -s https://fluxcd.io/install.sh | sudo bash
 cd ~/projects/cvat-gitops # or the folder you chose
 ```
 
-Now we will organise our git repo a bit, according to flux best practises. Note that flux doesn't enforce best practises, you are completely free.
+Now we will organise our git repo a bit, first we will do this as simple as possible, and then we will align with flux best practises.
 
 ### Flux bootstrap
 
@@ -245,19 +245,16 @@ kubectl get helmrelease
 ```
 ### Giving some structure to the repository
 
-Let's now see how flux gives you all the freedom you want:
+With the current structure, we have to duplicate our cvat folder for every cluster. That is not really optimal if we manage multiple clusters. We'd rather have a common cvat folder and then have only the cluster-specific stuff in a separate folder.
 
-* Suppose that you want to review and approve all new releases to production. This is easily done: on your git platform, create a new `protected` branch "production" on the repo, and disable push access to it. Now, the only way to change something in that branch is to make a merge request and have somebody merge it. Now, change the `GitRepository` in the `gotk-sync.yaml` file to point to the production branch, and you're done!
-
-* With the current structure, we have to duplicate our cvat folder for every cluster. That is not really what we want. We'd rather have a common cvat folder and then have only the cluster-specific stuff in a separate folder.
-
-Let's see if we can do that!
+This is why flux best practises organise the gitops repo in a different way than we did so far. Let's try to move our structure to the flux best practises and see if, this way, we can achieve the flexibility we want.
 
 First, move cvat to another directory `apps/base/cvat`. This will be our base directory for cvat.
 
 ```shell
 mkdir apps
-git mv clusters/tutorial/cvat/ apps/base
+## move the 'cvat' folder to apps/base
+git mv clusters/tutorial/cvat apps/base
 ```
 
 Now let's make an apps/ directory with the cvat configuration that would be specific for our cluster (for instance the hostname):
@@ -320,3 +317,16 @@ Let's see what role every level of indirection has:
 
 This is a common way of doing things in flux, but it doesn't stop here: you can combine all the resources at will, and you can even refer other git repositories from the main gitrepo and delegate parts to separate teams!.
 
+### A review process for production deployment
+
+To avoid human mistakes, we might want to make sure that every upgrade gets a proper review before being applied. Flux doesn't have any specific functionality for this, but that's not needed, as our configuration is now managed in git, and we can use the features offered by our git platform to achieve this.
+
+In order to impose a review process, carry out the following steps:
+
+* Create a new branch (eg `production`) on your gitops repository
+* Make this branch protected so that direct push to this branch is not allowed anymore. The only way to change the branch is to make a merge request to this branch.
+* Change the `GitRepository` in the `gotk-sync.yaml` file to point to the `production` branch.
+
+Now, whenever you want to make changes in production, first create a merge request (or pull request) with the necessary changes, and let somebody review the pull request. When reviewed, it can be marked as ready, and finally merged when the production release needs to happen.
+
+In addition to this, you could have another branch for the `staging` cluster, and have every release first go to staging before going to production.

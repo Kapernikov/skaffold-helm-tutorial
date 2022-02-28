@@ -195,3 +195,23 @@ Now inspect the resulting myapp-installation.yaml in your editor.
 [^1]: Actually helm also stores the values as a `secret` in kubernetes just for reference. But this is internal helm stuff, we should not rely on it.
 
 > **_WARNING_**: Understanding the concepts and what every layer does (containers, images, the docker build, kubernetes, helm) is critical for being able to work with kubernetes without frustration.  If you are already a bit confused now, make sure to clear this up before continuing with the next chapter. In the next chapter we will add **another** layer so if you're already confused now you will be completely confused next chapter.
+
+
+## Addendum: troubleshooting
+
+### another operation (install/upgrade/rollback) is in progress
+
+If you have this error, most likely you interrupted helm (or skaffold later) when it was busy performing an installation or an upgrade.
+Helm keeps some information stored on the server as configmaps and secrets (this allows you to find which helm packages are installed and upgraded afterwards). The error message pops up when, in the secrets or configmaps on the server, an installation is still marked as *busy*.
+
+In the ideal world, a helm installation would be completely transactional: either it would fully work, either nothing would happen. Unfortunately, we don't leave in the ideal world, so if you interrupt helm, you can end up with a half-installed release.
+
+If you try to see what is installed using `helm list` you will see that helm doesn't even list your software anymore.
+
+The trick to solving this problem:
+
+* first use `helm list` with the `-a` flag to show all releases, also the ones that are "in progress".
+* then use `helm rollback` to roll back to the last good version. This version is shown in the `helm list` output. If this was your first installation, then you don't have data to loose yet, so you can just `helm uninstall` and retry.
+
+
+
