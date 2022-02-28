@@ -20,7 +20,7 @@ sudo install kubectl /usr/local/bin
 
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
-curl -Lo skaffold https://github.com/GoogleContainerTools/skaffold/releases/download/v1.26.1/skaffold-linux-amd64 && \
+curl -Lo skaffold https://github.com/GoogleContainerTools/skaffold/releases/download/v1.36.0/skaffold-linux-amd64 && \
 sudo install skaffold /usr/local/bin/
 
 curl -Lo k9s.tgz https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz && \
