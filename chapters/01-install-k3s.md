@@ -331,7 +331,7 @@ helm install --wait -n registry --create-namespace \
         --set 'ingress.annotations.kubernetes\.io/ingress\.class'=nginx \
         --set "ingress.hosts[0]=registry.kube-public" \
         --set "ingress.tls[0].hosts[0]=registry.kube-public" \
-        --set ingress.tls[0].secretName="registry-tls" \
+        --set "ingress.tls[0].secretName=registry-tls" \
         --set persistence.enabled=true --set persistence.size=20Gi \
         --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m" \
         --set 'secrets.htpasswd'="$(htpasswd -Bbn registry $PASW)"
