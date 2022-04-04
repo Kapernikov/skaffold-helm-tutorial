@@ -5,7 +5,7 @@ how to use:
 
 
 1. Edit index.ts to add the machines you need for this tutorial, every machine with a username and a password. off course, don't commit your edits
-2. Set up pulumi:
+2. Set up pulumi. Make sure you have a recent nodeJS version installed, like 16.14.2 (otherwise you can use the `n` package to update)
 
 ```shell
 # install pulumi
@@ -23,13 +23,13 @@ npm install
 
 ```shell
 # change the passphrase if you didn't have it empty
-PULUMI_CONFIG_PASSPHRASE="" pulumi config set --secret hcloud:token <YOURTOKEN>
+pulumi config set --secret hcloud:token <YOURTOKEN>
 ```
 
 5. Create the machines
 
 ```shell
-PULUMI_CONFIG_PASSPHRASE="" pulumi up
+pulumi up
 ```
 
 6. Do the tutorial.
@@ -37,5 +37,5 @@ PULUMI_CONFIG_PASSPHRASE="" pulumi up
 7. At the end, destroy everything
 
 ```shell
-PULUMI_CONFIG_PASSPHRASE="" pulumi destroy
+pulumi destroy
 ```

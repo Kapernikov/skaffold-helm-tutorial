@@ -146,8 +146,9 @@ mkdir -p $HOME/kubeca && cd $HOME/kubeca
 ```
 
 Voila, this gives us:
- * `ca.key` which is the private key of the root CA
- * `ca.crt` which is the (self-signed) root certificate.
+
+* `ca.key` which is the private key of the root CA
+* `ca.crt` which is the (self-signed) root certificate.
 
 We will now upload these to kubernetes as a secret and tell cert-manager to use them.
 
@@ -180,7 +181,6 @@ If you get an error about an Addmission Web Hook, just wait a bit and try again.
 
 Since we didn't use real https certificates, our system will not trust this CA. Docker will refuse to push images to it and your browser would show a big warning when trying to surf to a website hosted on your cluster. We can fix this (at least for docker) easily by adding the CA to our local trust store.
 
-
 ```shell
 # lets make sure our computer trusts this CA!
 sudo cp ca.crt /usr/local/share/ca-certificates/selfsigned-k3s.crt && sudo update-ca-certificates
@@ -190,7 +190,6 @@ sudo systemctl restart k3s
 ```
 
 Note that both Firefox and Google Chrome don’t look at the CA certificates data (they have their own trust store). If you want the certificate to be valid in Firefox/Chrome, you will need to take extra steps that are dependent on the browser you are using. But don't bother for now, when hosting real websites we'll switch to cert-manager anyway.
-
 
 ## Installing docker registry
 
@@ -313,9 +312,7 @@ Ok, now that this has been taken care of, let's continue to install the containe
 
 </details>
 
-
 We will use helm to install the registry. You could also do it with plain kubectl and some yaml files, but helm will make it easier here. Don't worry about how helm works for now, we will look at it later in more detail.
-
 
 ```shell
 # let's install the registry
@@ -332,7 +329,7 @@ helm install --wait -n registry --create-namespace \
         --set 'ingress.annotations.kubernetes\.io/ingress\.class'=nginx \
         --set "ingress.hosts[0]=${REGISTRY_HOSTNAME}" \
         --set "ingress.tls[0].hosts[0]=${REGISTRY_HOSTNAME}" \
-        --set ingress.tls[0].secretName="registry-tls" \
+        --set "ingress.tls[0].secretName=registry-tls" \
         --set persistence.enabled=true --set persistence.size=20Gi \
         --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m" \
         --set 'secrets.htpasswd'="$(htpasswd -Bbn registry $PASW)"
@@ -379,7 +376,6 @@ if you get “login succeeded” all is fine. if you get certificate error, ther
 * docker accesses the right IP, but the registry or the certificate is not correctly installed and docker reaches some default kubernetes "not found" page instead of the registry.
 * docker is not even accessing the right IP (eg because your IP address changed or you forgot to update /etc/hosts)
 
-
 Not only your docker needs to be logged in to the registry to push images, kubernetes itself will also need to log in to the registry to get images from it. This is done by adding a secret, and refering to this secret in ImagePullSecrets in a later yaml.
 
 For instance suppose we want to create `registry-creds` secret in namespace `foo`:
@@ -424,12 +420,13 @@ sudo systemctl disable  portmap.service rpcbind.socket rpcbind.service
 
 If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try. In our experience, it tends to become unstable when your cluster is heavily loaded.
 
-# Playing around in our newly created kubernetes cluster
+## Playing around in our newly created kubernetes cluster
 
 Now we will try to use kubectl to get some information out of our kubernetes cluster.
 
 > If you work remotely, you can use kubectl in the remote session, but you could also use it locally. If you want to use local client tools with a remote kubernetes, just make sure you have the `.kube/config.yml` file in your local home directory (copy it from the remote machine). Then all commands should just work locally. You can also add the kubernetes cluster to your local lenses installation if you have the config file.
-## using kubectl
+
+### using kubectl
 
 OK, our kubernetes cluster is up and running and we installed some extras.
 We also used `kubectl` for the first time.
@@ -445,7 +442,7 @@ You will need some googling to do the following:
 
 * Can you try to get the logs of the pod in the registry namespace ?
 
-## Using k9s
+### Using k9s
 
 There are multiple tools to manage a kubernetes cluster: you can use a dashboard, there is [Lens](https://k8slens.dev/) which you can install on your computer, or you can use k9s.
 The nice thing of k9s is that it is very small and works over a remote ssh connection. It takes some time to get used to (less time if you already know vim) but its extremely quick once you get to know it.
