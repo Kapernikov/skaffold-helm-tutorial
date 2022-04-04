@@ -325,12 +325,13 @@ export PASW=$(pwgen -1)
 ### then install the registry
 cd /tmp
 git clone https://github.com/Kapernikov/docker-registry.helm.git
+export REGISTRY_HOSTNAME=registry.kube-public
 helm install --wait -n registry --create-namespace \
         registry ./docker-registry.helm \
         --set ingress.enabled=true \
         --set 'ingress.annotations.kubernetes\.io/ingress\.class'=nginx \
-        --set "ingress.hosts[0]=registry.kube-public" \
-        --set "ingress.tls[0].hosts[0]=registry.kube-public" \
+        --set "ingress.hosts[0]=${REGISTRY_HOSTNAME}" \
+        --set "ingress.tls[0].hosts[0]=${REGISTRY_HOSTNAME}" \
         --set ingress.tls[0].secretName="registry-tls" \
         --set persistence.enabled=true --set persistence.size=20Gi \
         --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m" \
@@ -352,7 +353,7 @@ END
 
 # no need to do this if we installed the auto-update script above
 MYIP=$(hostname -I | cut -d' ' -f1)
-echo "$MYIP registry.kube-public" | sudo tee -a /etc/hosts
+echo "$MYIP ${REGISTRY_HOSTNAME}" | sudo tee -a /etc/hosts
 ```
 
 When using Skaffold (later...), you will find that quickly, a lot of Docker images will pile up in your container registry, which will eat your disk space. Instead of carefully cleaning them up, we can also simply uninstall and reinstall the registry every now and then, skaffold will reupload all images if needed.
@@ -384,10 +385,11 @@ Not only your docker needs to be logged in to the registry to push images, kuber
 For instance suppose we want to create `registry-creds` secret in namespace `foo`:
 
 ```shell
+export TARGET_NAMESPACE=foo
 REGPASSWORD=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.password' | base64 --decode)
 REGUSERNAME=$(kubectl get secret -n registry registry-password -o json | jq -r '.data.username' | base64 --decode)
 REGHOST=$(kubectl get ingress -n registry registry-docker-registry -o json | jq -r '.spec.rules[0].host')
-kubectl create secret -n foo docker-registry registry-creds \
+kubectl create secret -n $TARGET_NAMESPACE docker-registry registry-creds \
    --docker-server=$REGHOST --docker-username=$REGUSERNAME --docker-password=$REGPASSWORD
 ```
 
@@ -409,7 +411,8 @@ helm install nfs-server-provisioner nfs-server-provisioner  \
   --namespace nfs-server-provisioner --create-namespace \
   --set persistence.storageClass="local-path" \
   --set persistence.size="200Gi" \
-  --set persistence.enabled=true
+  --set persistence.enabled=true \
+  --set 'storageClass.mountOptions[0]=tcp' --set 'storageClass.mountOptions[1]=nfsvers=4.1'
 ```
 
 > **Warning** installing nfs-common starts two services that we don't need, and that can be a security risk when you are on an internet connected machine. So don't forget to run the following commands to disable them again:
