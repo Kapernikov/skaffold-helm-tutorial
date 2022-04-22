@@ -23,6 +23,9 @@ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bas
 curl -Lo skaffold https://github.com/GoogleContainerTools/skaffold/releases/download/v1.36.0/skaffold-linux-amd64 && \
 sudo install skaffold /usr/local/bin/
 
+curl -Lo kubeseal.tgz https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.17.5/kubeseal-0.17.5-linux-amd64.tar.gz && \
+tar -f kubeseal.tgz -x kubeseal && sudo install kubeseal /usr/local/bin && rm -f kubeseal.tgz kubeseal
+
 curl -Lo k9s.tgz https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz && \
 tar -xf k9s.tgz  && sudo install k9s /usr/local/bin/
 
