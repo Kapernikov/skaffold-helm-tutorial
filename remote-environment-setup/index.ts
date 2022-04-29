@@ -72,6 +72,10 @@ machines.forEach(m => {
     curl -Lo kubectx https://github.com/ahmetb/kubectx/releases/download/v0.9.3/kubectx && \
     sudo install kubectx /usr/local/bin/
 
+    curl -Lo lazygit.tgz https://github.com/jesseduffield/lazygit/releases/download/v0.34/lazygit_0.34_Linux_x86_64.tar.gz 
+    tar -vx lazygit -f lazygit.tgz && sudo install lazygit /usr/local/bin
+    rm lazygit lazygit.tgz
+
     echo >> /etc/sysctl.conf
     echo "fs.inotify.max_user_watches=1048576" >> /etc/sysctl.conf
     echo "fs.inotify.max_user_instances=1000000" >> /etc/sysctl.conf
