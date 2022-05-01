@@ -13,13 +13,12 @@ For starting docker, we create a little script `start-docker.sh` that just start
 ```shell
 #!/bin/bash
 
-RUNNING=`ps ax | grep dockerd | grep sudo`
+RUNNING=$(ps ax | grep dockerd | grep sudo)
 
 if [ -z "$RUNNING" ]; then
     sudo dockerd > /dev/null 2>&1 &
     disown
 fi
-
 ```
 
 ## Shutting down docker
@@ -27,15 +26,13 @@ fi
 If you want to restart docker, you'll need to be able to shut it down. `stop-docker.sh` could look like this:
 
 ```shell
-
 #!/bin/bash
 
-RUNNING_PID=`ps ax | grep dockerd | grep sudo | awk '{print $1;}' `
+RUNNING_PID=$(ps ax | grep dockerd | grep sudo | awk '{print $1;}')
 
 if [ -n "$RUNNING_PID" ]; then
     sudo kill $RUNNING_PID
 fi
-
 ```
 
 ## Starting K3S
@@ -44,9 +41,8 @@ For starting k3s, `start-k3s.sh` could look like this:
 
 ```shell
 #!/bin/bash
-​
-​
-RUNNING=`ps aux | grep "k3s server" | grep -v grep`
+
+RUNNING=$(ps aux | grep "k3s server" | grep -v grep)
 if [ -z "$RUNNING" ]; then
     sudo k3s server > /dev/null 2>&1 &
     disown
@@ -60,10 +56,11 @@ And finally, `stop-k3s.sh`:
 ```shell
 #!/bin/bash
 
-RUNNING_PID=`ps ax | grep "k3s server" | grep sudo | awk '{print $1;}' `
+RUNNING_PID=$(ps ax | grep "k3s server" | grep sudo | awk '{print $1;}')
 
 if [ -n "$RUNNING_PID" ]; then
     sudo kill $RUNNING_PID
 fi
 
-​```
+sudo k3s-killall.sh
+```
