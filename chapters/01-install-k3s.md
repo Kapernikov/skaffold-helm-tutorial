@@ -20,7 +20,7 @@ sudo install kubectl /usr/local/bin
 
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
-curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.37.2/skaffold-linux-amd64 && \
+curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
 sudo install skaffold /usr/local/bin/
 
 curl -Lo kubeseal.tgz https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.17.5/kubeseal-0.17.5-linux-amd64.tar.gz && \
