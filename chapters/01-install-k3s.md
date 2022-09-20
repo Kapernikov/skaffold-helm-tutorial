@@ -358,7 +358,7 @@ echo "$MYIP ${REGISTRY_HOSTNAME}" | sudo tee -a /etc/hosts
 
 When using Skaffold (later...), you will find that quickly, a lot of Docker images will pile up in your container registry, which will eat your disk space. Instead of carefully cleaning them up, we can also simply uninstall and reinstall the registry every now and then, skaffold will reupload all images if needed.
 
-If everything worked fine you should be able to login with your docker now:
+###### If everything worked fine you should be able to login with your docker now:
 
 ```shell
 # here we use the '$()' syntax to take the output from a command and put it in a variable.
