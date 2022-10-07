@@ -334,7 +334,7 @@ helm install --wait -n registry --create-namespace \
         --set "ingress.tls[0].hosts[0]=${REGISTRY_HOSTNAME}" \
         --set "ingress.tls[0].secretName=registry-tls" \
         --set persistence.enabled=true --set persistence.size=20Gi \
-        --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="512m" \
+        --set 'ingress.annotations.nginx\.ingress\.kubernetes\.io/proxy-body-size'="5120m" \
         --set 'secrets.htpasswd'="$(htpasswd -Bbn registry $PASW)"
 #### lets upload our registry password so that we can retrieve it later to create 
 #### ImagePullSecrets or do docker login
