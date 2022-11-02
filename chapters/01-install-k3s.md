@@ -88,7 +88,7 @@ This is a config file that will be used by k3s when it starts. Now that the conf
 
 ```shell
 ## "normal" installation
-sudo bash -c "curl -sfL https://get.k3s.io | sh -"
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.7+k3s1 sh -
 ```
 
 K3s can be started and stopped with systemd, so systemctl stop k3s will stop K3s and systemctl start k3s will start it. However, **stopping K3s will leave all containers running**. To kill all containers, run `sudo k3s-killall.sh`.
