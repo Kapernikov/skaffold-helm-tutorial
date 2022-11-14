@@ -95,13 +95,16 @@ K3s can be started and stopped with systemd, so systemctl stop k3s will stop K3s
 
 When needed, you can start k3s again by doing `sudo systemctl start k3s`.
 
-Once K3s has finished startup, you will find a kubeconfig in `/etc/rancher/k3s/k3s.yaml`. This configfile can be copied to your .kube/config. When you want to merge multiple kubeconfigs in one, use [this guide](https://stackoverflow.com/questions/46184125/how-to-merge-kubectl-config-file-with-kube-config).
+Once K3s has finished startup, a file `/etc/rancher/k3s/k3s.yaml` will be created with configuration and credentials for connecting to the kubernetes cluster. This configuration is needed by all our client tools (`helm`, `kubectl`, `k9s`, ...) to make a succesfull connection to kubernetes.
+
+The client tools typically look for a client configuration in `.kube/config` in your homedir, so let's copy the file there. We need to use sudo because by default the file is only readable by root.
 
 ```shell
 mkdir -p $HOME/.kube
 sudo cat /etc/rancher/k3s/k3s.yaml > $HOME/.kube/config
 ```
 
+Sometimes you will have multiple clusters to manage. You will then have multiple config files. You can use the `KUBECONFIG` environment variable to tell the client tools which config file they should use. Alternatively, you can merge multiple kubeconfigs in one file. [This guide](https://stackoverflow.com/questions/46184125/how-to-merge-kubectl-config-file-with-kube-config) explains how.
 Now that K3S is up and running, we are going to install some software components. We will make use of kubernetes `namespaces` to do so. We will install different software components in different namespaces. This prevents two software packages from conflicting with each other when they would have resources with the same name. It also makes for easier maintenance later on.
 
 ## Installing nginx ingress controller
