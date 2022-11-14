@@ -105,6 +105,7 @@ sudo cat /etc/rancher/k3s/k3s.yaml > $HOME/.kube/config
 ```
 
 Sometimes you will have multiple clusters to manage. You will then have multiple config files. You can use the `KUBECONFIG` environment variable to tell the client tools which config file they should use. Alternatively, you can merge multiple kubeconfigs in one file. [This guide](https://stackoverflow.com/questions/46184125/how-to-merge-kubectl-config-file-with-kube-config) explains how.
+
 Now that K3S is up and running, we are going to install some software components. We will make use of kubernetes `namespaces` to do so. We will install different software components in different namespaces. This prevents two software packages from conflicting with each other when they would have resources with the same name. It also makes for easier maintenance later on.
 
 ## Installing nginx ingress controller
