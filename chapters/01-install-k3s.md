@@ -233,12 +233,13 @@ kubectl describe certificate -n registry registry-tls
 
 After our certificate is created, we can install a container registry. To do this, we need a hostname and an ip address that will be accessible **both from outside our cluster and from inside our cluster**. This is not so simple: we cannot use localhost or `127.0.0.1` because it doesn’t have the same meaning from outside our cluster (there it will be our pc) and inside our cluster (there it will be the current pod). So we will take the first local LAN ip address of our host. We will use /etc/hosts to make a name alias for this ip address. From then on, the registry will be accessible via `registry.kube-public`.
 
-> **_WARNING:_** On laptops this can be problematic: there, when you connect to another wifi network, you will get another local ip address, and your /etc/hosts file will not be valid anymore. This can make you loose a couple of time since the error message might be cryptic (like “SSL verification error”) as the “old” ip might now be taken by something else.  So whenever you switch networks, check your /etc/hosts. If you use our remote environment, don't worry, the ip address won't change there!
+> **_WARNING:_** On laptops this can be problematic: there, when you connect to another wifi network, you will get another local ip address, and your /etc/hosts file will not be valid anymore. This can make you loose some time debugging since the error message might be cryptic (like “SSL verification error”) as the “old” ip might now be taken by something else.  So whenever you switch networks, check your /etc/hosts. If you use our remote environment, don't worry, the ip address won't change there!
 
 <details>
 <summary>A solution is writing a script that automates updating /etc/hosts whenever your ip changes</summary>
 
-The following install script installs a systemd service that will auto-update /etc/hosts whenever your ip address changes.
+The following install script installs a systemd service that will auto-update /etc/hosts whenever your ip address changes.  
+If you use WSL, rather follow the instructions in [the WSL README](../README-WSL2.md#make-hostnames-available-in-wsl-and-windows).
 
 You can put the aliases you want in `/etc/update_hosts_file/aliases` (put them all on the same line, separated by spaces). Don't put comments in that file!
 
