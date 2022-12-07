@@ -54,7 +54,14 @@ sudo mkdir -p /etc/update_hosts_file
 
 
 
-## Starting docker
+## Scripts for starting and stopping docker
+
+If you're not using Docker Desktop for Windows, you need a docker installation inside the WSL distribution you are using. The following scripts can come in handy for starting or stopping the docker daemon.
+
+If you use Docker Desktop, just start it and enable the WSL integration for your WSL distribution. These scripts are not relevant then.
+
+
+### Starting docker
 
 For starting docker, we create a little script `start-docker.sh` that just starts docker if it isn't running already.
 At the same time, we invoke the script `update_hosts_file.sh` we created above, because this doesn't run automatically on WSL2 either as long as we don't have systemd running there.
@@ -72,7 +79,7 @@ if [ -z "$RUNNING" ]; then
 fi
 ```
 
-## Shutting down docker
+### Shutting down docker
 
 If you want to restart docker, you'll need to be able to shut it down. `stop-docker.sh` could look like this:
 
