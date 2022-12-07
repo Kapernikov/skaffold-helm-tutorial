@@ -43,11 +43,12 @@ echo "$MYIP $ALIASES ### UPDATE_HOSTS_FILE from /etc/update_hosts_file/aliases" 
 rm $TEMP_FILE
 
 END
-chmod u+x /usr/local/bin/update_hosts_file.sh
 
-mkdir -p /etc/update_hosts_file
+sudo chmod a+x /usr/local/bin/update_hosts_file.sh
 
-[[ -f /etc/update_hosts_file/aliases ]] ||  echo "registry.kube-public" > /etc/update_hosts_file/aliases
+sudo mkdir -p /etc/update_hosts_file
+
+[[ -f /etc/update_hosts_file/aliases ]] || echo "registry.kube-public" | sudo tee /etc/update_hosts_file/aliases
 ```
 
 

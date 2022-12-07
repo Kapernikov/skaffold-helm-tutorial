@@ -281,7 +281,8 @@ sed -i '/UPDATE_HOSTS_FILE/d' /etc/hosts
 echo "\$MYIP \$ALIASES ### UPDATE_HOSTS_FILE" | tee -a /etc/hosts
 
 END
-chmod u+x /usr/local/bin/update_hosts_file.sh
+
+sudo chmod u+x /usr/local/bin/update_hosts_file.sh
 
 cat << END | sudo tee /etc/systemd/system/ip-changed.target
 # /etc/systemd/system/ip-changed.target 
@@ -306,13 +307,13 @@ RemainAfterExit=true
 [Install]
 WantedBy=multi-user.target
 END
-mkdir -p /etc/update_hosts_file
 
-[[ -f /etc/update_hosts_file/aliases ]] ||  echo "registry.kube-public" > /etc/update_hosts_file/aliases
+sudo mkdir -p /etc/update_hosts_file
 
-systemctl enable --now ip-change-mon
-systemctl enable --now updatehosts
+[[ -f /etc/update_hosts_file/aliases ]] || echo "registry.kube-public" | sudo tee /etc/update_hosts_file/aliases
 
+sudo systemctl enable --now ip-change-mon
+sudo systemctl enable --now updatehosts
 ```
 
 Ok, now that this has been taken care of, let's continue to install the container registry.
