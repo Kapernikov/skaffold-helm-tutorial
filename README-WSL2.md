@@ -21,7 +21,7 @@ Put the hostnames you want in `/etc/update_hosts_file/aliases` (put them all on 
 ```shell
 #!/bin/sh
 
-cat << END | sudo tee /usr/local/bin/update_hosts_file.sh
+cat << 'END' | sudo tee /usr/local/bin/update_hosts_file.sh
 #!/bin/bash
 
 export MYIP=$(/usr/bin/hostname -I | cut -d' ' -f1)

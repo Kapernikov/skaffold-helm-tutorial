@@ -272,13 +272,13 @@ WantedBy=multi-user.target default.target
 END
 
 
-cat << END | sudo tee /usr/local/bin/update_hosts_file.sh
+cat << 'END' | sudo tee /usr/local/bin/update_hosts_file.sh
 #!/bin/bash
 
-export MYIP=\$(/usr/bin/hostname -I | cut -d' ' -f1)
-export ALIASES=\$(cat /etc/update_hosts_file/aliases)
+export MYIP=$(/usr/bin/hostname -I | cut -d' ' -f1)
+export ALIASES=$(cat /etc/update_hosts_file/aliases)
 sed -i '/UPDATE_HOSTS_FILE/d' /etc/hosts
-echo "\$MYIP \$ALIASES ### UPDATE_HOSTS_FILE" | tee -a /etc/hosts
+echo "$MYIP $ALIASES ### UPDATE_HOSTS_FILE" | tee -a /etc/hosts
 
 END
 
