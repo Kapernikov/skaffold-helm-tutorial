@@ -457,5 +457,5 @@ There are multiple tools to manage a kubernetes cluster: you can use a dashboard
 The nice thing of k9s is that it is very small and works over a remote ssh connection. It takes some time to get used to (less time if you already know vim) but its extremely quick once you get to know it.
 
 We will give a quick tour of k9s, but help yourself already and look here https://k9scli.io/topics/commands/ (look at the key bindings).
-Try to do the same excercises, but now using k9s.
+Try to do the same exercises, but now using k9s.
 
