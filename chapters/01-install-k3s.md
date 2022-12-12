@@ -67,7 +67,6 @@ kube-controller-manager-arg:
     - "node-monitor-period=60s"
 
 EOF
-
 ```
 
 Note that kubernetes by default won't allow you to start containers on nodes that have less than 10% available disk space and it will even kill containers if the disk space goes below 5%. This is a nice default for most cases but in some cases, eg when you have a 1TB disk you still have enough of space at 98%.
@@ -91,7 +90,9 @@ This is a config file that will be used by k3s when it starts. Now that the conf
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.7+k3s1 sh -
 ```
 
-If you are running inside a WSL distribution that doesn't have systemd enabled, you will receive an error message:
+### Installing and running k3s in WSL
+
+If you are running inside a WSL distribution that doesn't have systemd enabled, you will receive an error message at the end of the install:
 
 ```
 System has not been booted with systemd as init system (PID 1). Can't operate.
@@ -100,10 +101,12 @@ Failed to connect to bus: Host is down
 
 This is normal. Just use the start/stop scripts as explained in [README-WSL2.md](../README-WSL2.md).
 
+### Running k3s in Linux
 K3s can be started and stopped with systemd, so systemctl stop k3s will stop K3s and systemctl start k3s will start it. However, **stopping K3s will leave all containers running**. To kill all containers, run `sudo k3s-killall.sh`.
 
 When needed, you can start k3s again by doing `sudo systemctl start k3s`.
 
+### Configuring: kube config
 Once K3s has finished startup, a file `/etc/rancher/k3s/k3s.yaml` will be created with configuration and credentials for connecting to the kubernetes cluster. This configuration is needed by all our client tools (`helm`, `kubectl`, `k9s`, ...) to make a succesfull connection to kubernetes.
 
 The client tools typically look for a client configuration in `.kube/config` in your homedir, so let's copy the file there. We need to use sudo because by default the file is only readable by root.
@@ -193,19 +196,31 @@ spec:
 END
 ```
 
-If you get an error about an Addmission Web Hook, just wait a bit and try again. cert-manager is not yet fully installed.
+If you get an error about an Admission Web Hook, just wait a bit and try again. cert-manager is not yet fully installed.
 
 Since we didn't use real https certificates, our system will not trust this CA. Docker will refuse to push images to it and your browser would show a big warning when trying to surf to a website hosted on your cluster. We can fix this (at least for docker) easily by adding the CA to our local trust store.
+
+Note that both Firefox and Google Chrome don’t look at the CA certificates data (they have their own trust store). If you want the certificate to be valid in Firefox/Chrome, you will need to take extra steps that are dependent on the browser you are using. But don't bother for now, when hosting real websites we'll switch to cert-manager anyway.
 
 ```shell
 # lets make sure our computer trusts this CA!
 sudo cp ca.crt /usr/local/share/ca-certificates/selfsigned-k3s.crt && sudo update-ca-certificates
+
 # We need to restart both docker and k3s so they read the new ca-certificates trusts.
 sudo systemctl restart docker
 sudo systemctl restart k3s
 ```
 
-Note that both Firefox and Google Chrome don’t look at the CA certificates data (they have their own trust store). If you want the certificate to be valid in Firefox/Chrome, you will need to take extra steps that are dependent on the browser you are using. But don't bother for now, when hosting real websites we'll switch to cert-manager anyway.
+### When using Docker Desktop on Windows
+If you're using Docker Desktop on Windows, you need to register the certificate in Windows as well.
+
+1. In Windows Explorer, open `\\wsl$\MyDistribution\home\MyUsername\kubeca`
+2. Right-click on `ca.crt`
+3. Choose "Install Certificate"
+4. Choose Store Location: "Current User"
+5. Place certificates in the following store: "Trusted Root Certificate Authorities"
+
+Doc: https://docs.docker.com/registry/insecure/#use-self-signed-certificates.
 
 ## Installing docker registry
 
