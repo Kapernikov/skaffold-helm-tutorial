@@ -114,7 +114,7 @@ And finally, `stop-k3s.sh`:
 ```shell
 #!/bin/bash
 
-RUNNING_PID=$(ps ax | grep "k3s server" | grep sudo | awk '{print $1;}')
+RUNNING_PID=$(ps ax | grep "k3s server" | grep -v grep | awk '{print $1;}')
 
 if [ -n "$RUNNING_PID" ]; then
     sudo kill $RUNNING_PID
