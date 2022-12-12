@@ -91,6 +91,15 @@ This is a config file that will be used by k3s when it starts. Now that the conf
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.7+k3s1 sh -
 ```
 
+If you are running inside a WSL distribution that doesn't have systemd enabled, you will receive an error message:
+
+```
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down
+```
+
+This is normal. Just use the start/stop scripts as explained in [README-WSL2.md](../README-WSL2.md).
+
 K3s can be started and stopped with systemd, so systemctl stop k3s will stop K3s and systemctl start k3s will start it. However, **stopping K3s will leave all containers running**. To kill all containers, run `sudo k3s-killall.sh`.
 
 When needed, you can start k3s again by doing `sudo systemctl start k3s`.
