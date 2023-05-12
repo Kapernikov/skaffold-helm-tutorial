@@ -30,7 +30,7 @@ Let's try this:
 Create a `skaffold.yaml` file **in the root of this project** and put the following in:
 
 ```yaml
-apiVersion: skaffold/v2beta10
+apiVersion: skaffold/v4beta4
 kind: Config
 metadata:
     name: myapp
@@ -64,7 +64,7 @@ deploy:
     releases:
       - name: myapp
         chartPath: myapp
-        artifactOverrides: 
+        setValueTemplates:
           frontend.image: frontend
           api.image: api
 
