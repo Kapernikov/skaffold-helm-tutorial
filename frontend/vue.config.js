@@ -3,6 +3,6 @@ module.exports = {
     'vuetify'
   ],
   devServer: {
-    disableHostCheck: true
+    allowedHosts: 'all'
   }
 }
