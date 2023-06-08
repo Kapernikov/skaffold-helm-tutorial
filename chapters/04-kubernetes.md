@@ -68,6 +68,16 @@ API and frontend are stateless applications, meaning they don't retain any data 
 
 Like a Deployment, a StatefulSet manages Pods that are based on an identical container spec. Unlike a Deployment, a StatefulSet maintains a sticky identity for each of its Pods. These pods are created from the same spec, but are not interchangeable: each has a persistent identifier that it maintains across any rescheduling.
 
+Statefulsets have another difference with deployment: 
+- For a deployment, when a new version is rolled out, old pod is terminated **after** the new one is created
+- For a statefulSet, when a new version is rolled out, old pod is terminated **before** the new one is created
+
+Each behaviour as its use case: 
+- Deployment's one enable no down time between two versions.
+- Statefulset's one doesn't break the state. For databases this means all transactions have to be completed on the old pod before a new one is created.
+
+For a pod to retain data even with downtime, we need to assign it a volume. There a multiple ways to create and assign volumes and we will just cover one here, through a volumeClaimTemplates.
+
 Let's create a database kubernetes StatefulSet
 ```yaml
 # PostgreSQL StatefulSet
@@ -97,7 +107,6 @@ spec:
         value: astrongdatabasepassword
       - name: PGDATA
         value: /data/pgdata
-  # Volume Claim
 volumeClaimTemplates:
   - metadata:
       name: postgresql-db-disk
@@ -108,34 +117,16 @@ volumeClaimTemplates:
           storage: 2Gi
 ```
 
-## Linking our database to our deployment through a Service
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-db-svc
-spec:
-  selector:
-    app: postgresql-db
-  ports:
-  - port: 5432
-```
-
-test to query time-from-db. To do so, rebuild your image by adding psycopg2 pip package on the dockerfile.
-```dockerfile
-RUN pip install psycopg2
-```
 Questions!
 
 * Can you try to scale our deployment up and down ? Using k9s ? Using kubectl ?
 * Can you port-forward our deployment to something on our computer (shift-f in k9s) ?
-* Ok, next up is helm. Let's clean up and remove our deployment. We'll recreate it soon using helm. Try cleaning up the deployment using kubectl!
+
 
 
 ## Wrapping up
 
-So, we now created a **deployment** that in its turn created a **pod**. This pod has one container (because it is created from a pod template that specifies one single container) created from the docker image `registry.kube-public/myfrontend`.
+So, we now created a **deployment** and a **statefulset** that in its turn created a **pod**. These pods have one container (because it is created from a pod template that specifies one single container) created from either the docker image `registry.kube-public/myfrontend` or the public image `postgres:latest`.
 
 ![frontend-deployment](../imgs/frontend-deployment.png)
 
