@@ -15,7 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'uvicorn>=0.16',
-        'fastapi>=0.63'
+        'fastapi>=0.63',
+        'psycopg2-binary>=2.9'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

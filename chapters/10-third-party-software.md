@@ -117,60 +117,59 @@ An operator is basically:
 
 You will find lots of operators, both commercial and open source.
 
-## Hands-on: installing the zalando postgres operator
+## Hands-on: installing the Crunchy Data postgres operator
 
-Let's now experiment with the zalando postgres operator. The zalando postgres operator can be installed as a helm chart. Since we already know this, let's do that:
-First we need to add the helm repository.
+Let's now experiment with PGO, the Crunchy Data postgres operator. The crunchydb postgres operator can be installed as a helm chart. Since we already know this, let's do that:
 
-```shell
-helm repo add zalando-pgo https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
-# list all available helm charts in this repo
-helm search repo zalando-pgo
-```
-
-Now we can actually install this, let's create a namespace zalando-pgo
+let's create a namespace crunchy-pgo
 
 ```shell
-kubectl create namespace zalando-pgo
-helm install -n zalando-pgo postgres-operator zalando-pgo/postgres-operator
+kubectl create namespace crunchy-pgo
+helm install -n crunchy-pgo pgo oci://registry.developers.crunchydata.com/crunchydata/pgo
 ```
 
 Now the operator is installed.
 
 ## Deploying a highly available postgres cluster
 
-Now that the zalando postgres operator is running, we can use it to make a postgres cluster
+Now that the crunchy data postgres operator is running, we can use it to make a postgres cluster
 
 ```yaml
-apiVersion: "acid.zalan.do/v1"
-kind: postgresql
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
 metadata:
-  name: kapernikov-pg-cluster
+  name: my-postgres
 spec:
-  teamId: "kapernikov"
-  volume:
-    size: 3Gi
-  numberOfInstances: 2
-  users:
-    admin:
-    - superuser
-    - createdb
-    testuser: []
-  databases:
-    ourdatabase: testuser
-  postgresql:
-    version: "14"
-    parameters:
-      shared_buffers: "32MB"
-      max_connections: "40"
-      archive_mode: "on"
-      archive_timeout: 1800s
-      archive_command: /bin/true
-#      log_statement: "all"
+  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.5-1
+  postgresVersion: 14
+  instances:
+    - name: instance1
+      dataVolumeClaimSpec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  backups:
+    pgbackrest:
+      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.40-1
+      repos:
+      - name: repo1
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - "ReadWriteOnce"
+            resources:
+              requests:
+                storage: 1Gi
+  patroni:
+  dynamicConfiguration:
+    postgresql:
+      parameters:
+        max_parallel_workers: 2
+        max_worker_processes: 2
+        shared_buffers: 20MB
+        work_mem: 2MB
 ```
-
-## Upgrading the postgres cluster: giving it more storage
-
-Let's take the above yaml and change the shared_buffers to 40mb. then see what happens when applying the update.
 
 
