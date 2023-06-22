@@ -39,7 +39,7 @@ spec:
   - port: 5432
 ```
 
-This will serve as the front door of a pod selected because it has a label app set as "postgresql-db". It matches the label we have set on the statefulSet!
+This will serve as the front door of a pod selected because it has a label app set as "postgresql-db". It matches the label we have set on the statefulSet! And that's not all! services can be linked to multiple pods having the same label and will in that case also be a load balancer between them. 
 
 ![statefulset-with-service](../imgs/statefulset-with-service.png)
 
