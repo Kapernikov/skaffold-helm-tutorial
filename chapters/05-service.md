@@ -31,7 +31,7 @@ let's apply the following yaml:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-db-svc
+  name: postgres-db
 spec:
   selector:
     app: postgresql-db
