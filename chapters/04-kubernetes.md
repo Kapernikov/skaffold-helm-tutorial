@@ -76,11 +76,23 @@ Each behaviour as its use case:
 - Deployment's one enable no down time between two versions.
 - Statefulset's one doesn't break the state. For databases this means all transactions have to be completed on the old pod before a new one is created.
 
-For a pod to retain data even with downtime, we need to assign it a volume. There a multiple ways to create and assign volumes and we will just cover one here, through a volumeClaimTemplates.
-
 Let's create a database kubernetes StatefulSet
 ```yaml
 # PostgreSQL StatefulSet
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-initdb-config
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS counter (
+      counterId SERIAL PRIMARY KEY ,
+      api TEXT NOT NULL,
+      counter INTEGER NOT NULL default 0
+    );
+
+    INSERT INTO counter (api) VALUES ('myapi');
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -99,23 +111,35 @@ spec:
       containers:
       - name: postgresql-db
         image: postgres:latest
-      volumeMounts:
-      - name: postgresql-db-disk
-        mountPath: /data
-      env:
-      - name: POSTGRES_PASSWORD
-        value: astrongdatabasepassword
-      - name: PGDATA
-        value: /data/pgdata
-volumeClaimTemplates:
-  - metadata:
-      name: postgresql-db-disk
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 2Gi
+        volumeMounts:
+        - name: postgresql-db-disk
+          mountPath: /data
+        - name: postgresql-initdb
+          mountPath: /docker-entrypoint-initdb.d
+        env:
+        - name: POSTGRES_PASSWORD
+          value: astrongdatabasepassword
+        - name: PGDATA
+          value: /data/pgdata
+      volumes:
+      - name: postgresql-initdb
+        configMap:
+          name: postgresql-initdb-config
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-db-disk
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
 ```
+
+A lot is happening there, let's point the interesting parts one by one: 
+* A way to initialize a database is through another ressource called a ConfigMap. We start by creating one with a simple script inside it.
+* The pod created from this StatefulSet will be accessed through another component called a service that we will cover in depth on the next chapter. The serviceName key map this.
+* For a pod to retain data even with downtime, we need to assign it a volume. There a multiple ways to create and assign volumes. For this use case, we use what is called a volumeClaimTemplates.
+* For the init script to be executed, we also mount the ConfigMap defined above as a volume. Postgres has a default location for an init script to be executed at launch, so we set the mount path to match it. 
 
 Questions!
 
