@@ -87,7 +87,7 @@ This is a config file that will be used by k3s when it starts. Now that the conf
 
 ```shell
 ## "normal" installation
-curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.7+k3s1 sh -
+curl -sfL https://get.k3s.io | sh -
 ```
 
 ### Installing and running k3s in WSL
@@ -122,33 +122,20 @@ Now that K3S is up and running, we are going to install some software components
 
 ## Installing nginx ingress controller
 
-We will need to install the correct version of nginx ingress controller. For this, we need to determine which version of kubernetes is running. We can do this with `kubectl version`. There look at the **server version**:
-
-If you are on kubernetes **1.22** or newer you can use 1.0.0 of nginx:
+We can now install the nginx ingress controller so that we can use ingresses later. There are mulitple ways of installing it, we use the [official instructions](https://kubernetes.github.io/ingress-nginx/deploy/)
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/cloud/deploy.yaml
-```
-
-If you are on kubernetes **1.21** or older you need to use 0.44:
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.44.0/deploy/static/provider/baremetal/deploy.yaml
-```
-
-
-Now, this creates the Ingress service as a NodePort, which means it will be accessible to the outside world, but **on a random port, not port 80/443**. This is a nuisance, because this would require us to set up additional portforwarding or iptables rules. Fortunately, K3s has a built-in loadbalancer. We can just patch the service to make it of type LoadBalancer to make use of it:
-
-```shell
-kubectl patch -n ingress-nginx service ingress-nginx-controller -p '{"spec": {"type": "LoadBalancer"}}'
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace
 ```
 
 ## Installing cert-manager + a local certificate authority
 
-We will use [Cert manager](https://cert-manager.io/) for managing certificates. We will need https certificates for the registry we will run later, because docker only allows for https registries. Note that here, we will use a self-signed certificate authority. However, setting lets-encrypt is very very simple with cert-manager if you would ever need real https certificates!
+We will use [Cert manager](https://cert-manager.io/) for managing certificates. We will need https certificates for the **docker registry** we will run later, because docker only allows for https registries. Note that here, we will use a self-signed certificate authority. However, setting lets-encrypt is very very simple with cert-manager if you would ever need real https certificates!
 
 ```shell
-# install cert-manager 1.2.0
+# install cert-manager 1.12.2
 helm repo add jetstack https://charts.jetstack.io
 helm install -n cert-manager --create-namespace cert-manager jetstack/cert-manager --set installCRDs=true
 ```
@@ -354,12 +341,12 @@ sudo apt-get -y -f install pwgen apache2-utils
 export PASW=$(pwgen -1)
 ### then install the registry
 cd /tmp
-git clone https://github.com/Kapernikov/docker-registry.helm.git
+helm repo add twuni https://helm.twun.io
+
 export REGISTRY_HOSTNAME=registry.kube-public
 helm install --wait -n registry --create-namespace \
-        registry ./docker-registry.helm \
+        registry twuni/docker-registry \
         --set ingress.enabled=true \
-        --set 'ingress.annotations.kubernetes\.io/ingress\.class'=nginx \
         --set "ingress.hosts[0]=${REGISTRY_HOSTNAME}" \
         --set "ingress.tls[0].hosts[0]=${REGISTRY_HOSTNAME}" \
         --set "ingress.tls[0].secretName=registry-tls" \
@@ -424,15 +411,17 @@ kubectl create secret -n $TARGET_NAMESPACE docker-registry registry-creds \
 
 > Don't do this now (it won't even work, you have no namespace `foo` yet!), but you will need it later in the next chapters.
 
-## Installing a more capable storage backend
+## Installing a more capable storage backend (optional)
 
-The default hostpath provisioner (also in use by the other solutions) doesn’t support ReadWriteMany volumes. As a solution, we’ll install one that does. 
+The default hostpath provisioner (also in use by the other solutions) will, whenever a storage volume is needed, just take a folder on the machine you are running on. That's fine for experimenting, but will fail quickly in multi-node clusters: because these folders are not shared amongst the nodes, once created, a pod will never be able to move to another node, and you will not be able to share data between pods running on different nodes.
 
-[NFS Ganesha](https://nfs-ganesha.github.io/) allows for RWX volumes by taking a system-provided volume and launching a userspace NFS server on it. It won’t be the fastest performance, but it's lightweight (only 1 pod, rather than tens of pods for Longhorn).
+[NFS Ganesha](https://nfs-ganesha.github.io/) allows for shared (RWX) volumes by taking a system-provided volume and launching a userspace NFS server on it. Not really suitable for running production loads, but it's lightweight (only 1 pod), so ideal for the tutorial.
 
 ```shell
 # need nfs utilities on the host. that's the only dependency!
 sudo apt -y install nfs-common
+sudo systemctl stop  portmap.service rpcbind.socket rpcbind.service
+sudo systemctl disable  portmap.service rpcbind.socket rpcbind.service
 cd /tmp
 git clone https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner
 cd nfs-ganesha-server-and-external-provisioner/charts
@@ -451,7 +440,9 @@ sudo systemctl stop  portmap.service rpcbind.socket rpcbind.service
 sudo systemctl disable  portmap.service rpcbind.socket rpcbind.service
 ```
 
-If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try. In our experience, it tends to become unstable when your cluster is heavily loaded.
+If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try, but mind that maintaining a storage backend is a tedious task (no matter how easy the installation procedure makes it look). On a real project, you will probably use some vendor-supplied storage solution, like the one from AWS or Azure or other cloud providers.
+
+For an on premise solution, an easier to maintain option could be buying a (hardware) NAS that supports NFS (which is pretty much any brand nowadays) and then using a volume provider like [this one](https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/) to provision storage volumes from the NAS.
 
 ## Playing around in our newly created kubernetes cluster
 
