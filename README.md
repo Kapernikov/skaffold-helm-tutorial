@@ -60,5 +60,5 @@ sudo apt install wget curl vim zip git
 * Chapter 7: [Skaffold](chapters/07-skaffold.md)
 * Chapter 8: [A production version of our frontend container](chapters/08-frontend-production.md)
 * Chapter 9: [Ingress](chapters/09-ingress.md)
-* Chapter 10: [Working with 3rd party software](chapters/09-third-party-software.md)
-* Chapter 11: [gitops](chapters/10-gitops.md)
+* Chapter 10: [Working with 3rd party software](chapters/10-third-party-software.md)
+* Chapter 11: [gitops](chapters/11-gitops.md)
