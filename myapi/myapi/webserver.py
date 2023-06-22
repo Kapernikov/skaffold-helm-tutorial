@@ -31,14 +31,12 @@ async def get_time(request: Request):
 @app.get("/counter")
 def get_counter_from_db(request: Request):
     try:
-        print("DEBUG: Connecting...")
         conn = psycopg2.connect(
             host="postgres-db",
-            database="public",
+            database="postgres",
             user="postgres",
             password="astrongdatabasepassword"
         )
-        print("DEBUG: Connected!")
         cur = conn.cursor()
         cur.execute("UPDATE counter SET counter = counter + 1 WHERE api = 'myapi'")
         conn.commit()
@@ -47,7 +45,7 @@ def get_counter_from_db(request: Request):
         cur.close()
         conn.close()
     except:
-        print("ERROR: Cannot reach the database")
+        print("ERROR:    Cannot reach the database")
         n = 0
     finally:
         return {
