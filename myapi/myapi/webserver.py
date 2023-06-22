@@ -41,12 +41,12 @@ def get_counter_from_db(request: Request):
         cur.execute("UPDATE counter SET counter = counter + 1 WHERE api = 'myapi'")
         conn.commit()
         cur.execute("SELECT counter FROM counter WHERE api = 'myapi'")
-        n = cur.fetchone()
+        n = cur.fetchone()[0]
         cur.close()
         conn.close()
     except:
         print("ERROR:    Cannot reach the database")
-        n = 0
+        n = -1
     finally:
         return {
             "counter": n
