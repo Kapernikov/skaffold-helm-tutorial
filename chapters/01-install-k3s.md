@@ -338,13 +338,15 @@ We will use helm to install the registry. You could also do it with plain kubect
 # let's install the registry
 ### first generate a password
 sudo apt-get -y -f install pwgen apache2-utils
+```
+
+```shell
 export PASW=$(pwgen -1)
 ### then install the registry
-cd /tmp
 helm repo add twuni https://helm.twun.io
 
 export REGISTRY_HOSTNAME=registry.kube-public
-helm install --wait -n registry --create-namespace \
+helm upgrade --install --wait -n registry --create-namespace \
         registry twuni/docker-registry \
         --set ingress.enabled=true \
         --set "ingress.hosts[0]=${REGISTRY_HOSTNAME}" \
