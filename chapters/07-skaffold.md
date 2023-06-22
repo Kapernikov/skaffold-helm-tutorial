@@ -115,3 +115,4 @@ In addition to this, it has a live syncing feature to have even faster developme
 
 Skaffold also has built in facilities for setting up remote debugging of certain technologies.
 
+Note that skaffold is not the only technology available for unifying the build and the deployment. There are many others, like [Tilt](https://tilt.dev/), [DevSpace](https://devspace.sh/), [Draft](https://draft.sh/).
