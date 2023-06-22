@@ -25,12 +25,15 @@
           >request time</v-btn>
 
       </v-col>
-      <div v-if="counter !== 0">
+    </v-row>
+    <div v-if="counter !== 0">
+      <v-row class="text-center">
         <v-col class="mb-4">
           You visited this page {{ counter }} times!
         </v-col>
-      </div>
-    </v-row>
+      </v-row>
+    </div>
+
   </v-container>
 </template>
 
