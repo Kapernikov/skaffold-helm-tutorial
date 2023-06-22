@@ -25,8 +25,15 @@
           >request time</v-btn>
 
       </v-col>
-
     </v-row>
+    <div v-if="counter !== 0">
+      <v-row class="text-center">
+        <v-col class="mb-4">
+          You visited this page {{ counter }} times!
+        </v-col>
+      </v-row>
+    </div>
+
   </v-container>
 </template>
 
@@ -36,14 +43,23 @@
     name: 'HelloWorld',
 
     data: () => ({ 
-      current_time : "placeholder"
+      current_time : "placeholder",
+      counter: 0
     }),
     methods: {
       getTime: function() {
         axios
           .get('http://localhost:9999/time')
           .then(response => (this.current_time = response["data"]["current"]))
+      },
+      getCounter: function() {
+        axios
+          .get('http://localhost:9999/counter')
+          .then(response => (this.counter = response["data"]["counter"]))
       }
+    },
+    beforeMount() {
+      this.getCounter()
     }
   }
 </script>

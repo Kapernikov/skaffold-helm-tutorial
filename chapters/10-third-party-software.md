@@ -151,6 +151,9 @@ spec:
         resources:
           requests:
             storage: 1Gi
+  databaseInitSQL:
+    key: init.sql
+    name: postgresql-initdb-config
   backups:
     pgbackrest:
       image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.40-1

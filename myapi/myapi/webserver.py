@@ -28,21 +28,26 @@ async def get_time(request: Request):
         "current": n.strftime("%d/%m/%Y %H:%M:%S")
     }
 
-@app.get("/time-from-db")
-async def get_time_from_db(request: Request):
+@app.get("/counter")
+def get_counter_from_db(request: Request):
     try:
         conn = psycopg2.connect(
-            host="postgres",
-            database="public",
+            host="postgres-db",
+            database="postgres",
             user="postgres",
             password="astrongdatabasepassword"
         )
         cur = conn.cursor()
-        cur.execute('SELECT NOW()')
+        cur.execute("UPDATE counter SET counter = counter + 1 WHERE api = 'myapi'")
+        conn.commit()
+        cur.execute("SELECT counter FROM counter WHERE api = 'myapi'")
         n = cur.fetchone()
         cur.close()
+        conn.close()
     except:
-        n = "Error while trying to reach the database"
-    return {
-        "current": n
-    }
+        print("ERROR:    Cannot reach the database")
+        n = 0
+    finally:
+        return {
+            "counter": n
+        }
