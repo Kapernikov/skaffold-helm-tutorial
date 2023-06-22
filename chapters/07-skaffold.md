@@ -88,7 +88,7 @@ Question
 Ok let's build and push the images!
 
 ```shell
-skaffold build -d registry.kube-public
+skaffold build -d registry.kube-public -n default
 ```
 
 We can also deploy them:
