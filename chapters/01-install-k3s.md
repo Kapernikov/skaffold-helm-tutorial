@@ -440,7 +440,7 @@ sudo systemctl stop  portmap.service rpcbind.socket rpcbind.service
 sudo systemctl disable  portmap.service rpcbind.socket rpcbind.service
 ```
 
-If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try, but mind that maintaining a storage backend is a tedious task (no matter how easy the installation procedure makes it look). On a real project, you will probably use some vendor-supplied storage solution, like the one from AWS or Azure or other cloud providers.
+If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try, but mind that maintaining a storage backend is a tedious task (no matter how easy the installation procedure makes it look). On a real project, you will probably use some vendor-supplied storage solution, like the one from AWS or Azure or other cloud providers. Some cloud providers that don't have a kubernetes offering, but, for instance [on hetzner](https://github.com/hetznercloud/csi-driver/blob/main/docs/kubernetes/README.md#getting-started) you can still use their volume storage with your kubernetes installation.
 
 For an on premise solution, an easier to maintain option could be buying a (hardware) NAS that supports NFS (which is pretty much any brand nowadays) and then using a volume provider like [this one](https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/) to provision storage volumes from the NAS.
 
