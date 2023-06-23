@@ -7,7 +7,7 @@ kubectl get pod <<db-pod-name>> --template '{{printf "%s\n" .status.podIP}}'
 ```
 
 
-Let's lookup this pod from our frontend. Open a shell in the frontend pod (using k9s or kubectl exec -it <<frontend-pod_name>> -- /bin/bash) and run the following command (replace <<db-pod-ip>> with the ip address of the database pod:
+Let's lookup this pod from our frontend. Open a shell in the frontend pod (using k9s or `kubectl exec -it <<frontend-pod_name>> -- /bin/sh`) and run the following command (replace <<db-pod-ip>> with the ip address of the database pod:
 
 ```bash
 ## add 
