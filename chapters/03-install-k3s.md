@@ -10,7 +10,7 @@ We will now install kubernetes (using k3s) on our machine. In addition to this w
 
 Here is a schema summarizing all the components we will have on our base setup. We also added to the schema where our application will stand. 
 
-![wrap-up](../imgs/basic-setup.png)
+![wrap-up](../imgs/base-setup.png)
 
 * inside k3s, each rectangle represent a **namespace**, the kubernetes ressource meant to isolate groups of resources within a single cluster
 
