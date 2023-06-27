@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+test/
+myapp/
+
+skaffold.yaml
+remote-environment-setup/Pulumi.workshop*

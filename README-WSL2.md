@@ -8,7 +8,7 @@ Here is a list of things you have to do when working on wsl2. The easiest way to
 
 
 ## Make hostnames available in WSL and Windows
-This is an adapted version of the explanation given in [chapter 1](chapters/01-install-k3s.md#installing-docker-registry) 
+This is an adapted version of the explanation given in [chapter 3](chapters/03-install-k3s.md#installing-docker-registry) 
 to create a script `update_hosts_file.sh`.
 
 First, give your Windows user explicit writing permissions to the file `C:\Windows\System32\drivers\etc\hosts`. 

@@ -49,7 +49,8 @@ This will serve as the front door of a pod selected because it has a label app s
 
 ```bash
 apk add postgresql-client
-PGPASSWORD=astrongdatabasepassword psql -h postgres-db -U postgres
+PGPASSWORD=astrongdatabasepassword 
+psql -h postgres-db -U postgres
 ```
 
 Voila!
