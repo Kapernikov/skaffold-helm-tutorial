@@ -4,7 +4,6 @@ We will now install kubernetes (using k3s) on our machine. In addition to this w
 
 * an **ingress controller** (here we will use nginx instead of the traefik ingress controller that comes with k3s). This will allow us to run http/https services on our cluster.
 * a **docker registry**. We will build some software to run on kubernetes, and we need to store the docker images somewhere. We could use docker hub, but we will install a docker registry directly inside kubernetes. This way our docker images are very nearby and downloading them to the cluster will be super fast.
-* a **storage backend** that supports shared volumes. By default k3s already installs a storage backend that just exposes some folder from the host machine. But sometimes that doesn't cut it: we could need storage volumes that can be shared by multiple pods (kind of "shared drives"). We will install the most simple option for this.
 
 > A little warning: installing k3s adds one *node* to the cluster (your machine). This node is known by its name, which is your host name. So if you want to break your setup, by all means change your hostname after installing k3s. It would be a nice excercise to recover from the breakage introduced by changing the hostname, but that's a bit more advanced, so let's not do this now.
 
@@ -424,34 +423,7 @@ kubectl create secret -n $TARGET_NAMESPACE docker-registry registry-creds \
 
 > Don't do this now (it won't even work, you have no namespace `foo` yet!), but you will need it later in the next chapters.
 
-## Installing a more capable storage backend
 
-The default hostpath provisioner (also in use by the other solutions) doesn’t support ReadWriteMany volumes. As a solution, we’ll install one that does. 
-
-[NFS Ganesha](https://nfs-ganesha.github.io/) allows for RWX volumes by taking a system-provided volume and launching a userspace NFS server on it. It won’t be the fastest performance, but it's lightweight (only 1 pod, rather than tens of pods for Longhorn).
-
-```shell
-# need nfs utilities on the host. that's the only dependency!
-sudo apt -y install nfs-common
-cd /tmp
-git clone https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner
-cd nfs-ganesha-server-and-external-provisioner/charts
-helm install nfs-server-provisioner nfs-server-provisioner  \
-  --namespace nfs-server-provisioner --create-namespace \
-  --set persistence.storageClass="local-path" \
-  --set persistence.size="200Gi" \
-  --set persistence.enabled=true \
-  --set 'storageClass.mountOptions[0]=tcp' --set 'storageClass.mountOptions[1]=nfsvers=4.1'
-```
-
-> **Warning** installing nfs-common starts two services that we don't need, and that can be a security risk when you are on an internet connected machine. So don't forget to run the following commands to disable them again:
-
-```shell
-sudo systemctl stop  portmap.service rpcbind.socket rpcbind.service
-sudo systemctl disable  portmap.service rpcbind.socket rpcbind.service
-```
-
-If you are running a small multi-node cluster, [longhorn](https://longhorn.io/) is worth giving a try. In our experience, it tends to become unstable when your cluster is heavily loaded.
 
 ## Playing around in our newly created kubernetes cluster
 
@@ -482,4 +454,12 @@ The nice thing of k9s is that it is very small and works over a remote ssh conne
 
 We will give a quick tour of k9s, but help yourself already and look here https://k9scli.io/topics/commands/ (look at the key bindings).
 Try to do the same exercises, but now using k9s.
+
+
+## To go further
+
+This chapter cover a basic setup for the utilities we will need during this workshop. For a production ready environment, you will need more than this. [Extra chapter 12](chapters/12-extra-install.md) covers other tools that can come handy when setting up your environment:
+
+* a **storage backend** that supports shared volumes. By default k3s already installs a storage backend that just exposes some folder from the host machine. But sometimes that doesn't cut it: we could need storage volumes that can be shared by multiple pods (kind of "shared drives"). We will install the most simple option for this.
+
 

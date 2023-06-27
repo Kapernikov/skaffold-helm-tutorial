@@ -51,9 +51,9 @@ sudo apt install wget curl vim zip git
 
 * Optional: get set up to do this tutorial on a [remote machine](REMOTE.md)
 
-* Chapter 1: [Installing k3s](chapters/01-install-k3s.md)
-* Chapter 2: [Dockerize our API](chapters/02-dockerize-backend.md)
-* Chapter 3: [Dockerize our frontend app](chapters/03-dockerize-frontend.md)
+* Chapter 1: [Dockerize our API](chapters/01-dockerize-backend.md)
+* Chapter 2: [Dockerize our frontend app](chapters/02-dockerize-frontend.md)
+* Chapter 3: [Installing k3s](chapters/03-install-k3s.md)
 * Chapter 4: [Kubernetes](chapters/04-kubernetes.md)
 * Chapter 5: [Services](chapters/05-services.md)
 * Chapter 6: [Helm](chapters/06-helm.md)
