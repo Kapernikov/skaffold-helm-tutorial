@@ -47,6 +47,7 @@ build:
             - "*.py"
             - "**/*.py"
             - "**/*.html"
+            - "**/*~"
       - image: frontend
         context: frontend
         docker:
@@ -58,6 +59,7 @@ build:
             - "*.vue"
             - "**/*.vue"
             - "**/*.js"
+            - "**/*~"
 
 deploy:
   helm:
@@ -102,7 +104,6 @@ Question:
 * Can you try to make one of the templates invalid (e.g. just put some gibberish invalid yaml). Just like in last chapter. What error do you get now ? Is it a skaffold error or a helm error ? What happens if you introduce a syntax error in the skaffold.yaml ?
 * Try `skaffold dev` instead of `skaffold run`. What happens ?
 * While skaffold dev is running, change (and save) HelloWorld.vue from frontend/src/components. What happens ?
-* Now try skaffold dev with some extra arguments: `--auto-build=false` `--auto-deploy=false` and `--cleanup=false`. Now try the above experiment again.
 * We're done now with this chapter. Can you clean up (using Skaffold of course) ?
 
 ## Wrapping up
@@ -115,3 +116,4 @@ In addition to this, it has a live syncing feature to have even faster developme
 
 Skaffold also has built in facilities for setting up remote debugging of certain technologies.
 
+Note that skaffold is not the only technology available for unifying the build and the deployment. There are many others, like [Tilt](https://tilt.dev/), [DevSpace](https://devspace.sh/), [Draft](https://draft.sh/).

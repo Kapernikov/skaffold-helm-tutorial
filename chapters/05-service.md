@@ -7,21 +7,23 @@ kubectl get pod <<db-pod-name>> --template '{{printf "%s\n" .status.podIP}}'
 ```
 
 
-Let's lookup this pod from our frontend:
+Let's lookup this pod from our frontend. Open a shell in the frontend pod (using k9s or `kubectl exec -it <<frontend-pod_name>> -- /bin/sh`) and run the following command (replace `<<db-pod-ip>>` with the ip address of the database pod:
 
 ```bash
-kubectl exec -it <<frontend-pod_name>> -- nslookup <<db-pod-ip>>
+## add 
+apk add postgresql-client
+PGPASSWORD=astrongdatabasepassword psql -h <<db-pod-ip>> -U postgres
 ```
 
-- Delete the statefulSet and recreate it. What happen to the IP address?
+We can connect to our databases (and, for instance, with `\d`, list tables)!
 
-It changes! 
+Now, delete the postgresql-db-0 pod. The statefulset will automatically recreate one. But what happened to the IP address? (hint: It changes!)
 
-This IP is randomly chosen in a range of available address. Obviously it makes it not possible to work with pods as is, as we would need to update all the referenced ip between pods each time we have a new version, without knowing them.
+The IP is randomly chosen in a range of available address. That would make things very hard, as we would need to update all the referenced ip between pods each time a pod gets restarted.
 
 ![statefulset](../imgs/statefulset.png)
 
-To solve this, we got services!
+To solve this, we will use Services!
 
 ## Getting Started
 
@@ -43,12 +45,14 @@ This will serve as the front door of a pod selected because it has a label app s
 
 ![statefulset-with-service](../imgs/statefulset-with-service.png)
 
--> We can use name of the service as an endpoint to access the pod! 
+-> We can use name of the service as an endpoint to access the pod. Let's open a terminal in the `frontend` pod again, and do:
 
 ```bash
-kubectl exec -it <<frontend-pod_name>> -- nslookup postgres-db-svc
+apk add postgresql-client
+PGPASSWORD=astrongdatabasepassword psql -h postgres-db -U postgres
 ```
 
+Voila!
 
 ## Wrapping up and undrestanding what happens
 

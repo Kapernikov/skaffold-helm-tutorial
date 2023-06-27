@@ -1,7 +1,13 @@
 # Creating a production dockerfile for our frontend
 
-Up to now we ran the frontend from our nodejs development server. That's nice as it autocompiles stuff, but its also not nice because its not meant for production.
-Let's try to fix that. We will create a new dockerfile, this time called just `Dockerfile` in our frontend/docker folder:
+Up to now we ran the frontend from our nodejs development server. That's nice as it autocompiles stuff whenever something changes, but its also not nice because its not meant for production (where we will just rebuild the docker image when something needs to change).
+
+Let's try to fix that: we will now make our build in two parts:
+
+* The first part will compile all vue code to static html, javascript and css
+* The second part will setup a nginx webserver that just serves the static files.
+
+ We will create a new dockerfile, this time called just `Dockerfile` in our frontend/docker folder:
 
 ```Dockerfile
 # stage 1
@@ -26,7 +32,7 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-In our second stage, we use docker/default.conf as nginx configuration. Let's create a very simple one and save the following as frontend/docker/default.conf:
+In our second stage, we use `docker/default.conf` as nginx configuration. Let's create a very simple one and save the following as `frontend/docker/default.conf`:
 
 ```nginx
 server {
@@ -51,7 +57,7 @@ Voila! Can you build and run this docker image locally ?
 
 ## Introducing skaffold profiles: make skaffold behave differently for dev and prod.
 
-Let's first fix our skaffold yaml so that it uses the Dockerfile instead of Dockerfile.dev for our frontend. Now our skaffold is like a "production" one.
+Let's first fix our skaffold yaml so that it uses the Dockerfile instead of Dockerfile.dev for our frontend (*please make this modification*). Now our skaffold is like a "production" one.
 Now we'll introduce a "dev" profile in skaffold. Let's add the following section to the bottom of our skaffold yaml:
 
 ```yaml
@@ -66,6 +72,13 @@ profiles:
 So now we added a dev profile that patches the dockerfile from the second (0 is the first) artifact. We can select a profile when starting skaffold:
 
 ```shell
+## run in production
+skaffold run -d registry.kube-public
+
+## run in development mode
 skaffold run -d registry.kube-public -p dev
+
+## autosync enabled in development mode
+skaffold dev -d registry.kube-public -p dev
 ```
 

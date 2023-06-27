@@ -144,6 +144,7 @@ spec:
   postgresVersion: 14
   instances:
     - name: instance1
+      replicas: 1
       dataVolumeClaimSpec:
         accessModes:
         - "ReadWriteOnce"
@@ -166,13 +167,27 @@ spec:
               requests:
                 storage: 1Gi
   patroni:
-  dynamicConfiguration:
-    postgresql:
-      parameters:
-        max_parallel_workers: 2
-        max_worker_processes: 2
-        shared_buffers: 20MB
-        work_mem: 2MB
+    dynamicConfiguration:
+      postgresql:
+        parameters:
+          max_parallel_workers: 2
+          max_worker_processes: 2
+          shared_buffers: 20MB
+          work_mem: 2MB
 ```
+
+Deploy this yaml file and see what happens. Note that the cluster is not really highly available, as there is only one postgres (replica) pod running! Update the above yaml file to have 2 replica's and deploy again (without first removing the `PostgresCluster`). What happens ? Can you check the logs of the newly started postgres pod ? What does it do ?
+
+See [here](https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/high-availability/) for the full documentation.
+
+## A small final note: should you actually do this ?
+
+It might now sound tempting to actually do this for production workloads. Why go through the trouble of procuring a SAAS SQL database like RDS or Azure PostgreSQL, which often requires extra configuration and might have a very hard to predict cost ? With some extra configuration (out of scope for this tutorial) you can even set up streaming WAL backups to amazon S3 or Azure blob storage!
+
+However, there are still quite some reasons to not do it. The most important one is that the maintenance burden is on you. There might be a bug in the opensource crunchydb operator which one day (maybe due to an unrelated upgrade of say, the kubernetes version) causes an outage. Then it will be you or your collegues searching for a solution. One day, you will have to upgrade the operator and the version of postgreSQL. Most probably this will be documented extensively, but you will probably want to try it out first on a test environment before doing the upgrade in production.
+
+For a smaller project (or a big project that only has a small relational DB), most probably, it will be not worth the trouble, and a SAAS will be a better option. Only when you have the scale (and hence the team capacity), deploying your own solution will give you an advantage.
+
+This was already true before the advent of Kubernetes, but with the higher level of automation that kubernetes operators offer compared to installing postgreSQL on a bare-metal linux machine, it becomes much less obvious, but still true.
 
 

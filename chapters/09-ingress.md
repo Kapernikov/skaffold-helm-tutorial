@@ -18,7 +18,7 @@ spec:
     - host: frank-test.duckdns.org
       http:
         paths:
-          - path: "/(time|settings)(.*)"
+          - path: "/(time|settings|counter)(.*)"
             pathType: ImplementationSpecific
             backend:
               service:

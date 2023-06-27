@@ -15,7 +15,7 @@ helm create myapp
 Now we have some work to do:
 
 * helm creates a lot of stuff to explain helm, we don't need it! make the file `values.yaml` empty, and remove all files and directory under the `templates` folder, but keep the templates folder!
-* now move our deployment yaml from last excercise to the templates folder and .. voila we have a working helm chart (albeit not a very useful one)
+* now move our deployment yaml from chapter 4 to the templates folder and .. voila we have a working helm chart (albeit not a very useful one)
 
 We can try to install it:
 ```shell
@@ -32,6 +32,8 @@ helm uninstall myapp-deployment-1
 ```
 
 ## Introduce stuff that's configurable
+
+Now in the helm chart, the docker image to be used for the frontend is hardcoded. Typically, we want this to be configurable..
 
 Let's put the following in values.yaml:
 
@@ -152,7 +154,8 @@ spec:
 Questions:
 
 * Does it work ? Can you fix it ? What's wrong (hint: two things are wrong) ?
-* Why are we using a statefulset instead of a deployment here ?
+
+
 
 <details>
   <summary>Click here to see why it didn't work!</summary>
@@ -167,6 +170,9 @@ Now that everything is fixed, more questions:
 
 * Can you look at the logs from the frontend container in kubernetes ? What do you see ?
 * Can you try to make one of the templates invalid (eg just put some gibberish invalid yaml). What error do you get ? Remember how the error looks, its not the last time you will see it!
+* The database is missing from the helm chart. Can you also add it ?
+* Could you make the deployment of a database optional ? Because in production, we probably would not use a postgresql container as database (no backups, no HA, no ...)
+
 
 ## Wrapping up and undrestanding what happens
 
