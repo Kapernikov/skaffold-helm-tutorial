@@ -63,6 +63,11 @@ a deployment should create pods, so let's check if they are there:
 kubectl get pod
 ```
 
+If your pod won't run because of `ErrImagePull` or `ImagePullBackOff`:
+* check the reason why (with `kubectl describe pod`)
+* go back to [the last paragraph of the registry section in chapter 3](./03-install-k3s.md#installing-docker-registry).
+
+
 The same should be possible in k9s: you can go to the deployments by typing `:` followed by *deploy*.
 
 ## Creating a StatefulSet for a database
