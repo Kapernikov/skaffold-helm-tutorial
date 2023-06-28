@@ -377,5 +377,5 @@ Try to do the same exercises, but now using k9s.
 
 ## To go further
 
-This chapter cover a basic setup for the utilities we will need during this workshop. For a fully functionnal environment, you would need better file handling. The [extra chapter](99-extra-install.md) covers the installation of a **storage backend** that supports shared volumes. By default k3s already installs a storage backend that just exposes some folder from the host machine. But sometimes that doesn't cut it: we could need storage volumes that can be shared by multiple pods (kind of "shared drives").
+This chapter cover a basic setup for the utilities we will need during this workshop. For a fully functionnal environment, you would need better file handling. The [extra chapter](99-extra-install.md) covers the installation of a **storage backend** that supports shared volumes. By default k3s already installs a storage backend that just exposes some folder from the host machine. But sometimes that doesn't cut it: we could need storage volumes that can be shared by multiple pods across multiple nodes (type `ReadWriteMany`).
 
