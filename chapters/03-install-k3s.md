@@ -302,7 +302,7 @@ stringData:
 END
 
 
-# no need to do this if we installed the auto-update script above
+# registry.kube-public is not really a domain name, let's make it known to our machine
 MYIP=$(hostname -I | cut -d' ' -f1)
 echo "$MYIP ${REGISTRY_HOSTNAME}" | sudo tee -a /etc/hosts
 ```
