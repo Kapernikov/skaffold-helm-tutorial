@@ -66,13 +66,10 @@ For this excercise, forward the following ports:
 
 Some extensions will be handy for this tutorial:
 
-* **Markdown all in one** this will enable you to open these documents directly in vscode with a nice preview (control-shift-P, then type 'markdown' and choose open preview to the side)
-* **python** (the official one from microsoft), obviously. intellisense and more.
-* **vue** (from jcbuisson), we have a small frontend excercise in vue.
-* **vetur** intellisense for vue.
+* **python**, obviously. intellisense and more.
+* **volar** (Vue language features) we have a small frontend excercise in vue.
 * **docker** edit dockerfiles and also browse your local docker server using the icon in the left bar
 * **kubernetes** will have some syntax for yaml files for kubernetes, but also it allows you to browse your kubernetes cluster once its up and running (you might need to reopen visual studio code if you installed this extension before installing kubernetes)
-* **Git lens** vscode comes with basic git support baked in, but git lens gives you some more advanced features. For today you won't need it, but you might later.
 
 Note that you might already have some of these on your local system, but we are working remotely now. The extensions need to be installed on the remote machine.
 
