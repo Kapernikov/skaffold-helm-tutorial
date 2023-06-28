@@ -84,7 +84,7 @@ portForward:
 Question
 
 * Try to understand the skaffold "build" section.
-* Try to understand the skaffold "deploy" section (especially "artifactOverrides")
+* Try to understand the skaffold "deploy" section (especially "setValueTemplates")
 
 
 Ok let's build and push the images!
