@@ -31,7 +31,7 @@ This tutorial assumes some knowledge beforehand. You will have trouble following
 
 ## Software requirements
 
-> **Note**: If you work on a remomte machine provided by Kapernikov, the software requirements are already ok, so no need to do anything here!
+> **Note**: If you work on a remote machine provided by Kapernikov, the software requirements are already ok, so no need to do anything here!
 
 This tutorial assumes the use of linux. You can also use a virtual machine on windows or WSL2 (avoid WSL1, it won't work). For WSL2, you need to take into account some caveats. See specific instructions [here](README-WSL2.md).
 
