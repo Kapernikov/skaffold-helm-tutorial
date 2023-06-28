@@ -343,7 +343,8 @@ kubectl create secret -n $TARGET_NAMESPACE docker-registry registry-creds \
    --docker-server=$REGHOST --docker-username=$REGUSERNAME --docker-password=$REGPASSWORD
 ```
 
-> Don't do this now (it won't even work, you have no namespace `foo` yet!), but you will need it later in the next chapters.
+
+> Don't do this now (it won't even work, you have no namespace `foo` yet!), but you will need it later in the next chapters. There, you will have to do it for the `default` namespace, which is the namespace that gets used when you don't specify a namespace.
 
 ## Playing around in our newly created kubernetes cluster
 
