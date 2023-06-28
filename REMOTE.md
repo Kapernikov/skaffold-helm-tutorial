@@ -62,6 +62,12 @@ For this excercise, forward the following ports:
 * 8888
 * 9999
 
+The result should look like this:
+
+![Port forwarding: the result](imgs/port-forward-vscode-result.png "screenshot")
+
+> **Note**: visual studio code will autodetect a *wrong* port in some occasions. So even if it looks like all ports are automagically forwarded, double check that it really forwarded 8888 and 9999.
+
 ## install some extensions
 
 Some extensions will be handy for this tutorial:
