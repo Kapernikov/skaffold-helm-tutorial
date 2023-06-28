@@ -57,7 +57,7 @@ sudo apt install wget curl vim zip git
 * Chapter 2: [Dockerize our frontend app](chapters/02-dockerize-frontend.md)
 * Chapter 3: [Installing k3s](chapters/03-install-k3s.md)
 * Chapter 4: [Kubernetes](chapters/04-kubernetes.md)
-* Chapter 5: [Services](chapters/05-services.md)
+* Chapter 5: [Services](chapters/05-service.md)
 * Chapter 6: [Helm](chapters/06-helm.md)
 * Chapter 7: [Skaffold](chapters/07-skaffold.md)
 * Chapter 8: [A production version of our frontend container](chapters/08-frontend-production.md)
