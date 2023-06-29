@@ -2,6 +2,8 @@
 
 You can do this tutorial on WSL2 with some caveats. WSL2 is a fully functional linux environment in windows, but, by default, no systemd is running. This means systemd services are not started up on boot.
 
+> **NOTE**: The WSL2 specific instructions are possibly outdated as of 2023. Also, we have seen people run into hard to debug issues when running K3S on wsl2. Currently, we cannot recommend using WSL2 for doing this tutorial.
+
 For instance, while you can install docker just like on linux, docker won't start up automatically. You'll have to start up docker (every time you reboot).
 
 Here is a list of things you have to do when working on wsl2. The easiest way to accomplish this is to make a set of little scripts you can run every time you need to do one of these actions.
