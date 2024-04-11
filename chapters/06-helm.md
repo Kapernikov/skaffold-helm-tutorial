@@ -38,8 +38,10 @@ Now in the helm chart, the docker image to be used for the frontend is hardcoded
 Let's put the following in values.yaml:
 
 ```yaml
-frontend: 
-  image: registry.kube-public/myfrontend
+frontend:
+  image: 
+    repository: registry.kube-public/myfrontend
+    tag: null
 ```
 
 Note that our values.yaml is a free form yaml. as long as its valid yaml you can put anything there.
@@ -67,13 +69,13 @@ spec:
         - name: registry-creds
       containers:
         - name: frontend
-          image: {{ .Values.frontend.image }}
+          image: "{{ .Values.frontend.image.repository }}:{{ default .Chart.AppVersion .Values.frontend.image.tag }}"
 ```
 
 Now we can actually vary our image using this syntax:
 
 ```shell
-helm install myapp-deployment-1 myapp --set frontend.image=some.invalid/image
+helm install myapp-deployment-1 myapp --set frontend.image.repository=some.invalid/image --set frontend.image.tag=latest
 ```
 
 Questions:
@@ -82,6 +84,8 @@ Questions:
 * Can you clean up our helm chart again ?
 * Can you also make the number of replicas configurable and try setting them using helm ?
 * Do you think it is really needed to completely uninstall/reinstall a helm chart after making changes ?
+
+> **Note**: we here split the image in two parts, a repository and a tag. This is not strictly needed (you could just go ahead and define a single `image` variable), but it is a good practice to split the image in two parts. This way you can easily override the tag without having to specify the whole image name. We also use the `appVersion` as a default image tag. This way, we can later easily release helm charts with a new version of the frontend without having to change the helm chart.
 
 ## Introducing a service for the frontend
 
@@ -108,7 +112,9 @@ Let's make this quick. in values.yaml, add a section for the backend:
 
 ```yaml
 backend: 
-  image: registry.kube-public/myapi
+  image: 
+    repository: registry.kube-public/myapi
+    tag: null
 ```
 
 Now let's create an `api.yaml` under templates:
@@ -148,7 +154,7 @@ spec:
       containers:
         - name: api
           imagePullPolicy: Always
-          image: {{ .Values.images.api.image }}
+          image: "{{ .Values.api.image.repository }}:{{ default .Chart.AppVersion .Values.api.image.tag }}"
 ```
 
 Questions:

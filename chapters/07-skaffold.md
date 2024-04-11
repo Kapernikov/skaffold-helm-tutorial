@@ -30,7 +30,7 @@ Let's try this:
 Create a `skaffold.yaml` file **in the root of this project** and put the following in:
 
 ```yaml
-apiVersion: skaffold/v4beta4
+apiVersion: skaffold/v4beta10
 kind: Config
 metadata:
     name: myapp
@@ -67,8 +67,10 @@ deploy:
       - name: myapp
         chartPath: myapp
         setValueTemplates:
-          frontend.image: frontend
-          api.image: api
+          frontend.image.repository: "{{.IMAGE_REPO_frontend}}"
+          frontend.image.tag: "{{.IMAGE_TAG_frontend}}"
+          api.image.repository: "{{.IMAGE_REPO_api}}"
+          api.image.tag: "{{.IMAGE_TAG_api}}"
 
 portForward:
   - resourceType: service
