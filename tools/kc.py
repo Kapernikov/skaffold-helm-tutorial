@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os
 import sys
 import yaml
@@ -76,12 +77,14 @@ def parse_options(args):
 
 
 def print_help():
+    print()
     print("Usage: kc.py [options]")
     print("Options:")
     print("  --install: Install kc.py to ~/.kube/kc.py")
     print("  --run: Combine config files in ~/.kube/config.d and save to ~/.kube/config")
     print("  --kubeconfig: Specify the path to save the combined config file (instead of ~/.kube/config)")
     print("  -v, --verbose: Print more information")
+    print()
 
 import getopt
 if __name__ == "__main__":
@@ -112,7 +115,7 @@ if __name__ == "__main__":
         output_config_path = str(override_kubeconfig_path or default_kubeconfig_path)
 
         combined_config = combine_configs(config_directory, verbose)
-        if len(combine_configs['clusters']) == 0:
+        if len(combined_config['clusters']) == 0:
             print("No clusters found in config files, not overwriting kubeconfig file. Exiting.")
             sys.exit(1)
         save_yaml_file(combined_config, output_config_path)
