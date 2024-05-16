@@ -35,6 +35,8 @@ kind: Config
 metadata:
     name: myapp
 build:
+    tagPolicy:
+      inputDigest: {}
     local:
       concurrency: 0
     artifacts:
