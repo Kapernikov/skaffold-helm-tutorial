@@ -133,6 +133,7 @@ We can now install the nginx ingress controller so that we can use ingresses lat
 ```shell
 helm upgrade --install ingress-nginx ingress-nginx \
   --repo https://kubernetes.github.io/ingress-nginx \
+  --set controller.allowSnippetAnnotations=true \
   --namespace ingress-nginx --create-namespace
 ```
 
